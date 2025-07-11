@@ -15,7 +15,7 @@ export const isBrowser = (): boolean => {
  * Check if we're in a development environment
  */
 export const isDevelopment = (): boolean => {
-  return process.env.NODE_ENV === 'development';
+  return typeof process !== 'undefined' && process.env?.NODE_ENV === 'development';
 };
 
 /**

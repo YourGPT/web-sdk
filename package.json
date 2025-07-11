@@ -1,6 +1,6 @@
 {
-  "name": "@yourgpt/sdk",
-  "version": "1.0.0",
+  "name": "@yourgpt/widget-web-sdk",
+  "version": "0.0.1",
   "description": "Official YourGPT SDK for JavaScript/TypeScript and React applications",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
