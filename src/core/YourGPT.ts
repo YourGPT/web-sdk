@@ -6,7 +6,7 @@ import { YourGPTConfig, YourGPTError, WidgetState, EventHandler, EventUnsubscrib
 
 import { ChatbotAPI, AIActionsAPI, MessageData, EscalationData, SessionData, VisitorData, ContactData, GameOptions, AIActionHandler } from "../types";
 
-import { isBrowser, createDebugLogger, validateWidgetId, validateUrl, loadScript, loadCSS, waitFor, EventEmitter } from "../utils";
+import { isBrowser, createDebugLogger, validateWidgetId, validateUrl, loadScript, waitFor, EventEmitter } from "../utils";
 
 interface YourGPTEvents {
   stateChange: WidgetState;
@@ -137,7 +137,7 @@ class YourGPTSDK extends EventEmitter<YourGPTEvents> {
       this.createRootContainer();
 
       // Load CSS
-      await loadCSS(`${endpoint}/chatbot.css`);
+      // await loadCSS(`${endpoint}/chatbot.css`);
 
       // Load JavaScript
       await loadScript(`${endpoint}/chatbot.js`);

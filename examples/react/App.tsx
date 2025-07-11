@@ -196,8 +196,14 @@ function UserProfile() {
 // AI Actions Demo Component
 function AIActionsDemo() {
   const aiActions = useAIActions();
+  const [registeredActionNames, setRegisteredActionNames] = useState<string[]>([]);
 
   useEffect(() => {
+    // Helper function to update registered actions
+    const updateRegisteredActions = () => {
+      setRegisteredActionNames(aiActions.registeredActions);
+    };
+
     // Register location action
     aiActions.registerAction("get_location", async (data, helpers) => {
       const confirmed = await helpers.confirm({
@@ -273,6 +279,9 @@ function AIActionsDemo() {
       },
     });
 
+    // Update initial state
+    updateRegisteredActions();
+
     // Cleanup on unmount
     return () => {
       aiActions.unregisterAction("get_location");
@@ -282,17 +291,17 @@ function AIActionsDemo() {
       aiActions.unregisterAction("scroll_to_top");
       aiActions.unregisterAction("get_current_time");
     };
-  }, [aiActions]);
+  }, []);
 
   return (
     <div className="ai-actions-demo">
       <h2>AI Actions Demo</h2>
       <p>
-        Registered Actions: <strong>{aiActions.registeredActions.length}</strong>
+        Registered Actions: <strong>{registeredActionNames.length}</strong>
       </p>
 
       <div className="action-list">
-        {aiActions.registeredActions.map((action) => (
+        {registeredActionNames.map((action) => (
           <div key={action} className="action-item">
             <code>{action}</code>
           </div>
