@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YourGPT SDK - Vanilla JS Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background: #e9ecef;
+        }
+        .log {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-left: 3px solid #007bff;
+            background: white;
+        }
+        .ai-actions {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3cd;
+            border-radius: 5px;
+        }
+        .ai-actions h3 {
+            margin-top: 0;
+            color: #856404;
+        }
+        .action-list {
+            list-style: none;
+            padding: 0;
+        }
+        .action-list li {
+            background: #fff;
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 3px;
+            border-left: 3px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>YourGPT SDK - Vanilla JavaScript Example</h1>
+        
+        <div class="controls">
+            <button id="openBtn">Open Chat</button>
+            <button id="closeBtn">Close Chat</button>
+            <button id="toggleBtn">Toggle Chat</button>
+            <button id="showBtn">Show Widget</button>
+            <button id="hideBtn">Hide Widget</button>
+            <button id="messageBtn">Send Message</button>
+            <button id="gameBtn">Start Quiz</button>
+            <button id="sheetBtn">Open Docs</button>
+        </div>
+
+        <div class="status">
+            <h3>Widget Status</h3>
+            <div id="status">Initializing...</div>
+        </div>
+
+        <div class="ai-actions">
+            <h3>AI Actions</h3>
+            <p>Registered Actions: <span id="actionCount">0</span></p>
+            <ul id="actionList" class="action-list"></ul>
+        </div>
+
+        <div class="log">
+            <h3>Event Log</h3>
+            <div id="log"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { YourGPT } from './sdk.js';
+
+        // Initialize SDK
+        async function init() {
+            try {
+                await YourGPT.init({
+                    widgetId: 'your-widget-id-here',
+                    endpoint: 'https://widget.yourgpt.ai',
+                    debug: true
+                });
+
+                const sdk = YourGPT.getInstance();
+                
+                // Set up event listeners
+                setupEventListeners(sdk);
+                
+                // Set up AI actions
+                setupAIActions(sdk);
+                
+                // Set up button handlers
+                setupButtonHandlers(sdk);
+                
+                // Set initial data
+                setupInitialData(sdk);
+                
+                log('SDK initialized successfully');
+                updateStatus(sdk);
+                
+            } catch (error) {
+                log('Failed to initialize SDK: ' + error.message);
+                document.getElementById('status').textContent = 'Failed to initialize';
+            }
+        }
+
+        function setupEventListeners(sdk) {
+            // Widget initialization
+            sdk.onInit(() => {
+                log('Widget initialized and connected');
+                updateStatus(sdk);
+            });
+
+            // Message received
+            sdk.onMessageReceived((data) => {
+                log('Message received: ' + JSON.stringify(data));
+            });
+
+            // Human escalation
+            sdk.onEscalatedToHuman((data) => {
+                log('Escalated to human: ' + JSON.stringify(data));
+            });
+
+            // Widget popup state
+            sdk.onWidgetPopup((isOpen) => {
+                log('Widget popup: ' + (isOpen ? 'opened' : 'closed'));
+                updateStatus(sdk);
+            });
+        }
+
+        function setupAIActions(sdk) {
+            // Register location action
+            sdk.registerAIAction('get_location', async (data, helpers) => {
+                const confirmed = await helpers.confirm({
+                    title: 'Location Access',
+                    description: 'This demo wants to access your location. Allow?',
+                    acceptLabel: 'Allow',
+                    rejectLabel: 'Deny'
+                });
+
+                if (confirmed) {
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(
+                            (position) => {
+                                const { latitude, longitude } = position.coords;
+                                helpers.respond(`Current location: ${latitude}, ${longitude}`);
+                            },
+                            (error) => {
+                                helpers.respond('Failed to get location: ' + error.message);
+                            }
+                        );
+                    } else {
+                        helpers.respond('Geolocation not supported');
+                    }
+                } else {
+                    helpers.respond('Location access denied');
+                }
+            });
+
+            // Register system info action
+            sdk.registerAIAction('get_system_info', async (data, helpers) => {
+                const systemInfo = {
+                    userAgent: navigator.userAgent,
+                    language: navigator.language,
+                    platform: navigator.platform,
+                    screenSize: `${screen.width}x${screen.height}`,
+                    windowSize: `${window.innerWidth}x${window.innerHeight}`,
+                    url: window.location.href,
+                    timestamp: new Date().toISOString()
+                };
+
+                helpers.respond(`System Information:\n${JSON.stringify(systemInfo, null, 2)}`);
+            });
+
+            // Register current time action
+            sdk.registerAIAction('get_current_time', async (data, helpers) => {
+                const now = new Date();
+                helpers.respond(`Current time: ${now.toLocaleString()}`);
+            });
+
+            // Register page title action
+            sdk.registerAIAction('get_page_title', async (data, helpers) => {
+                helpers.respond(`Page title: ${document.title}`);
+            });
+
+            // Update action list
+            updateActionList(sdk);
+        }
+
+        function setupButtonHandlers(sdk) {
+            document.getElementById('openBtn').onclick = () => {
+                sdk.open();
+                log('Open widget command sent');
+            };
+
+            document.getElementById('closeBtn').onclick = () => {
+                sdk.close();
+                log('Close widget command sent');
+            };
+
+            document.getElementById('toggleBtn').onclick = () => {
+                sdk.toggle();
+                log('Toggle widget command sent');
+            };
+
+            document.getElementById('showBtn').onclick = () => {
+                sdk.show();
+                log('Show widget command sent');
+            };
+
+            document.getElementById('hideBtn').onclick = () => {
+                sdk.hide();
+                log('Hide widget command sent');
+            };
+
+            document.getElementById('messageBtn').onclick = () => {
+                sdk.sendMessage('Hello from the demo!');
+                log('Message sent: Hello from the demo!');
+            };
+
+            document.getElementById('gameBtn').onclick = () => {
+                sdk.startGame('quizMania', {
+                    showExitConfirmation: true,
+                    leadCapture: true
+                });
+                log('Quiz game started');
+            };
+
+            document.getElementById('sheetBtn').onclick = () => {
+                sdk.openBottomSheet('https://docs.yourgpt.ai');
+                log('Bottom sheet opened with docs');
+            };
+        }
+
+        function setupInitialData(sdk) {
+            // Set session data
+            sdk.setSessionData({
+                userId: 'demo-user-123',
+                source: 'vanilla-demo',
+                timestamp: new Date().toISOString()
+            });
+
+            // Set visitor data
+            sdk.setVisitorData({
+                userAgent: navigator.userAgent,
+                referrer: document.referrer,
+                viewport: `${window.innerWidth}x${window.innerHeight}`
+            });
+
+            // Set contact data
+            sdk.setContactData({
+                email: 'demo@example.com',
+                name: 'Demo User'
+            });
+
+            log('Initial data set');
+        }
+
+        function updateStatus(sdk) {
+            const state = sdk.getState();
+            const status = `
+                Connected: ${state.isConnected ? '✅' : '❌'} | 
+                Loaded: ${state.isLoaded ? '✅' : '❌'} | 
+                Visible: ${state.isVisible ? '✅' : '❌'} | 
+                Open: ${state.isOpen ? '✅' : '❌'} | 
+                Messages: ${state.messageCount}
+            `;
+            document.getElementById('status').innerHTML = status;
+        }
+
+        function updateActionList(sdk) {
+            const actions = sdk.getRegisteredAIActions();
+            const actionCount = document.getElementById('actionCount');
+            const actionList = document.getElementById('actionList');
+            
+            actionCount.textContent = actions.length;
+            
+            actionList.innerHTML = actions.map(action => 
+                `<li>${action}</li>`
+            ).join('');
+        }
+
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        // Initialize when page loads
+        init();
+    </script>
+</body>
+</html>

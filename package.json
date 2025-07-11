@@ -1,0 +1,94 @@
+{
+  "name": "@yourgpt/sdk",
+  "version": "1.0.0",
+  "description": "Official YourGPT SDK for JavaScript/TypeScript and React applications",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "react/dist/**/*",
+    "react/package.json",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./react": {
+      "import": "./react/dist/index.mjs",
+      "require": "./react/dist/index.js",
+      "types": "./react/dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "npm run build:core && npm run build:react",
+    "build:core": "tsup src/index.ts --format cjs,esm --dts",
+    "build:react": "tsup src/react/index.ts --format cjs,esm --dts --outdir react/dist",
+    "dev": "npm run build:core -- --watch",
+    "dev:react": "npm run build:react -- --watch",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "clean": "rm -rf dist react/dist",
+    "prepublishOnly": "npm run clean && npm run build",
+    "release": "npm run build && npm publish --access public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourgpt/sdk.git"
+  },
+  "keywords": [
+    "yourgpt",
+    "chatbot",
+    "ai",
+    "sdk",
+    "typescript",
+    "react",
+    "hooks",
+    "widget"
+  ],
+  "author": "YourGPT <support@yourgpt.ai>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yourgpt/sdk/issues"
+  },
+  "homepage": "https://github.com/yourgpt/sdk#readme",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "eslint": "^8.0.0",
+    "eslint-plugin-react": "^7.0.0",
+    "eslint-plugin-react-hooks": "^4.0.0",
+    "jsdom": "^23.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

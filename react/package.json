@@ -1,0 +1,13 @@
+{
+  "name": "@yourgpt/sdk/react",
+  "private": true,
+  "description": "React hooks for YourGPT SDK",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  }
+}
