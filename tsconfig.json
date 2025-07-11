@@ -17,7 +17,6 @@
     "rootDir": "./src",
     "removeComments": false,
     "noEmit": false,
-    "incremental": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noUnusedLocals": true,

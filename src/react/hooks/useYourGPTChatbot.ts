@@ -2,8 +2,8 @@
  * React Hook for YourGPT Chatbot functionality
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { YourGPT, YourGPTSDK } from '../../core/YourGPT';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import YourGPT, { YourGPTSDK } from '../../core/YourGPT';
 import { 
   ChatbotAPI, 
   WidgetState, 
@@ -41,7 +41,7 @@ export function useYourGPTChatbot(): ChatbotAPI {
     setState(sdk.getState());
 
     // Listen for state changes
-    const unsubscribe = sdk.on('stateChange', (newState) => {
+    const unsubscribe = sdk.on('stateChange', (newState: WidgetState) => {
       setState(newState);
     });
 

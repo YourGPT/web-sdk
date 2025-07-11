@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { YourGPT, useYourGPTChatbot, useAIActions } from '@yourgpt/sdk/react';
+import React, { useEffect, useState } from "react";
+import { YourGPT, useYourGPTChatbot, useAIActions } from "@yourgpt/sdk/react";
 
 // Initialize SDK
 YourGPT.init({
-  widgetId: 'your-widget-id-here',
-  endpoint: 'https://widget.yourgpt.ai',
-  debug: true
+  widgetId: "232d2602-7cbd-4f6a-87eb-21058599d594",
+  endpoint: "https://widget.yourgpt.ai",
+  debug: true,
 });
 
 // Main App Component
@@ -16,7 +16,7 @@ function App() {
         <h1>YourGPT SDK - React Example</h1>
         <p>Demonstrating React hooks integration</p>
       </header>
-      
+
       <main className="app-main">
         <ChatControls />
         <UserProfile />
@@ -32,28 +32,28 @@ function ChatControls() {
   const chatbot = useYourGPTChatbot();
 
   const handleQuickMessage = () => {
-    chatbot.sendMessage('Hello! I need help with my account.');
+    chatbot.sendMessage("Hello! I need help with my account.");
   };
 
   const handleStartQuiz = () => {
-    chatbot.startGame('quizMania', {
+    chatbot.startGame("quizMania", {
       showExitConfirmation: true,
       leadCapture: true,
       gameConfig: {
-        difficulty: 'medium',
-        category: 'product-knowledge'
-      }
+        difficulty: "medium",
+        category: "product-knowledge",
+      },
     });
   };
 
   const handleOpenDocs = () => {
-    chatbot.openBottomSheet('https://docs.yourgpt.ai');
+    chatbot.openBottomSheet("https://docs.yourgpt.ai");
   };
 
   return (
     <div className="chat-controls">
       <h2>Widget Controls</h2>
-      
+
       <div className="button-group">
         <button onClick={chatbot.open}>Open Chat</button>
         <button onClick={chatbot.close}>Close Chat</button>
@@ -67,33 +67,25 @@ function ChatControls() {
         <button onClick={handleStartQuiz}>Start Quiz</button>
         <button onClick={handleOpenDocs}>View Docs</button>
       </div>
-      
+
       <div className="widget-status">
         <h3>Widget Status</h3>
         <div className="status-grid">
           <div className="status-item">
             <span>Connected:</span>
-            <span className={chatbot.isConnected ? 'status-ok' : 'status-error'}>
-              {chatbot.isConnected ? '✅' : '❌'}
-            </span>
+            <span className={chatbot.isConnected ? "status-ok" : "status-error"}>{chatbot.isConnected ? "✅" : "❌"}</span>
           </div>
           <div className="status-item">
             <span>Loaded:</span>
-            <span className={chatbot.isLoaded ? 'status-ok' : 'status-error'}>
-              {chatbot.isLoaded ? '✅' : '❌'}
-            </span>
+            <span className={chatbot.isLoaded ? "status-ok" : "status-error"}>{chatbot.isLoaded ? "✅" : "❌"}</span>
           </div>
           <div className="status-item">
             <span>Visible:</span>
-            <span className={chatbot.isVisible ? 'status-ok' : 'status-error'}>
-              {chatbot.isVisible ? '✅' : '❌'}
-            </span>
+            <span className={chatbot.isVisible ? "status-ok" : "status-error"}>{chatbot.isVisible ? "✅" : "❌"}</span>
           </div>
           <div className="status-item">
             <span>Open:</span>
-            <span className={chatbot.isOpen ? 'status-ok' : 'status-error'}>
-              {chatbot.isOpen ? '✅' : '❌'}
-            </span>
+            <span className={chatbot.isOpen ? "status-ok" : "status-error"}>{chatbot.isOpen ? "✅" : "❌"}</span>
           </div>
           <div className="status-item">
             <span>Messages:</span>
@@ -109,15 +101,15 @@ function ChatControls() {
 function UserProfile() {
   const chatbot = useYourGPTChatbot();
   const [userData, setUserData] = useState({
-    id: '12345',
-    email: 'user@example.com',
-    name: 'John Doe',
-    plan: 'pro',
+    id: "12345",
+    email: "user@example.com",
+    name: "John Doe",
+    plan: "pro",
     preferences: {
-      theme: 'dark',
+      theme: "dark",
       notifications: true,
-      language: 'en'
-    }
+      language: "en",
+    },
   });
 
   // Update chatbot data when user data changes
@@ -126,7 +118,7 @@ function UserProfile() {
     chatbot.setContactData({
       email: userData.email,
       name: userData.name,
-      user_hash: `user_${userData.id}`
+      user_hash: `user_${userData.id}`,
     });
 
     // Set session data (temporary data for this session)
@@ -134,81 +126,63 @@ function UserProfile() {
       userId: userData.id,
       plan: userData.plan,
       sessionStart: new Date().toISOString(),
-      features: userData.plan === 'pro' ? ['ai-actions', 'games', 'priority-support'] : ['basic-chat'],
-      preferences: userData.preferences
+      features: userData.plan === "pro" ? ["ai-actions", "games", "priority-support"] : ["basic-chat"],
+      preferences: userData.preferences,
     });
 
     // Set visitor data (analytics/tracking data)
     chatbot.setVisitorData({
-      source: 'react-demo',
+      source: "react-demo",
       userAgent: navigator.userAgent,
       referrer: document.referrer,
       viewport: `${window.innerWidth}x${window.innerHeight}`,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }, [userData, chatbot]);
 
   const updatePreferences = (key: string, value: any) => {
-    setUserData(prev => ({
+    setUserData((prev) => ({
       ...prev,
-      preferences: { ...prev.preferences, [key]: value }
+      preferences: { ...prev.preferences, [key]: value },
     }));
   };
 
   return (
     <div className="user-profile">
       <h2>User Profile</h2>
-      
+
       <div className="profile-info">
         <div className="info-item">
           <label>Name:</label>
-          <input
-            type="text"
-            value={userData.name}
-            onChange={(e) => setUserData(prev => ({ ...prev, name: e.target.value }))}
-          />
+          <input type="text" value={userData.name} onChange={(e) => setUserData((prev) => ({ ...prev, name: e.target.value }))} />
         </div>
         <div className="info-item">
           <label>Email:</label>
-          <input
-            type="email"
-            value={userData.email}
-            onChange={(e) => setUserData(prev => ({ ...prev, email: e.target.value }))}
-          />
+          <input type="email" value={userData.email} onChange={(e) => setUserData((prev) => ({ ...prev, email: e.target.value }))} />
         </div>
         <div className="info-item">
           <label>Plan:</label>
-          <select
-            value={userData.plan}
-            onChange={(e) => setUserData(prev => ({ ...prev, plan: e.target.value }))}
-          >
+          <select value={userData.plan} onChange={(e) => setUserData((prev) => ({ ...prev, plan: e.target.value }))}>
             <option value="free">Free</option>
             <option value="pro">Pro</option>
             <option value="enterprise">Enterprise</option>
           </select>
         </div>
       </div>
-      
+
       <div className="preferences">
         <h3>Preferences</h3>
         <div className="pref-item">
           <label>
-            <input
-              type="checkbox"
-              checked={userData.preferences.notifications}
-              onChange={(e) => updatePreferences('notifications', e.target.checked)}
-            />
+            <input type="checkbox" checked={userData.preferences.notifications} onChange={(e) => updatePreferences("notifications", e.target.checked)} />
             Enable Notifications
           </label>
         </div>
-        
+
         <div className="pref-item">
           <label>
             Theme:
-            <select
-              value={userData.preferences.theme}
-              onChange={(e) => updatePreferences('theme', e.target.value)}
-            >
+            <select value={userData.preferences.theme} onChange={(e) => updatePreferences("theme", e.target.value)}>
               <option value="light">Light</option>
               <option value="dark">Dark</option>
             </select>
@@ -225,21 +199,21 @@ function AIActionsDemo() {
 
   useEffect(() => {
     // Register location action
-    aiActions.registerAction('get_location', async (data, helpers) => {
+    aiActions.registerAction("get_location", async (data, helpers) => {
       const confirmed = await helpers.confirm({
-        title: 'Location Access',
-        description: 'This React app wants to access your location. Allow?',
-        acceptLabel: 'Allow',
-        rejectLabel: 'Deny'
+        title: "Location Access",
+        description: "This React app wants to access your location. Allow?",
+        acceptLabel: "Allow",
+        rejectLabel: "Deny",
       });
 
       if (!confirmed) {
-        helpers.respond('Location access denied by user');
+        helpers.respond("Location access denied by user");
         return;
       }
 
       if (!navigator.geolocation) {
-        helpers.respond('Geolocation not supported by this browser');
+        helpers.respond("Geolocation not supported by this browser");
         return;
       }
 
@@ -255,20 +229,20 @@ function AIActionsDemo() {
     });
 
     // Register React component info action
-    aiActions.registerAction('get_react_info', async (data, helpers) => {
+    aiActions.registerAction("get_react_info", async (data, helpers) => {
       const reactInfo = {
         version: React.version,
         mode: process.env.NODE_ENV,
-        components: ['App', 'ChatControls', 'UserProfile', 'AIActionsDemo', 'EventLogger'],
-        hooks: ['useYourGPTChatbot', 'useAIActions'],
-        timestamp: new Date().toISOString()
+        components: ["App", "ChatControls", "UserProfile", "AIActionsDemo", "EventLogger"],
+        hooks: ["useYourGPTChatbot", "useAIActions"],
+        timestamp: new Date().toISOString(),
       };
 
       helpers.respond(`React App Information:\n${JSON.stringify(reactInfo, null, 2)}`);
     });
 
     // Register system info action
-    aiActions.registerAction('get_system_info', async (data, helpers) => {
+    aiActions.registerAction("get_system_info", async (data, helpers) => {
       const systemInfo = {
         userAgent: navigator.userAgent,
         language: navigator.language,
@@ -276,7 +250,7 @@ function AIActionsDemo() {
         screenSize: `${screen.width}x${screen.height}`,
         windowSize: `${window.innerWidth}x${window.innerHeight}`,
         url: window.location.href,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       helpers.respond(`System Information:\n${JSON.stringify(systemInfo, null, 2)}`);
@@ -284,39 +258,41 @@ function AIActionsDemo() {
 
     // Register batch actions
     aiActions.registerActions({
-      'get_page_title': async (data, helpers) => {
+      get_page_title: async (data, helpers) => {
         helpers.respond(`Page title: ${document.title}`);
       },
-      
-      'scroll_to_top': async (data, helpers) => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        helpers.respond('Scrolled to top of page');
+
+      scroll_to_top: async (data, helpers) => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        helpers.respond("Scrolled to top of page");
       },
-      
-      'get_current_time': async (data, helpers) => {
+
+      get_current_time: async (data, helpers) => {
         const now = new Date();
         helpers.respond(`Current time: ${now.toLocaleString()}`);
-      }
+      },
     });
 
     // Cleanup on unmount
     return () => {
-      aiActions.unregisterAction('get_location');
-      aiActions.unregisterAction('get_react_info');
-      aiActions.unregisterAction('get_system_info');
-      aiActions.unregisterAction('get_page_title');
-      aiActions.unregisterAction('scroll_to_top');
-      aiActions.unregisterAction('get_current_time');
+      aiActions.unregisterAction("get_location");
+      aiActions.unregisterAction("get_react_info");
+      aiActions.unregisterAction("get_system_info");
+      aiActions.unregisterAction("get_page_title");
+      aiActions.unregisterAction("scroll_to_top");
+      aiActions.unregisterAction("get_current_time");
     };
   }, [aiActions]);
 
   return (
     <div className="ai-actions-demo">
       <h2>AI Actions Demo</h2>
-      <p>Registered Actions: <strong>{aiActions.registeredActions.length}</strong></p>
-      
+      <p>
+        Registered Actions: <strong>{aiActions.registeredActions.length}</strong>
+      </p>
+
       <div className="action-list">
-        {aiActions.registeredActions.map(action => (
+        {aiActions.registeredActions.map((action) => (
           <div key={action} className="action-item">
             <code>{action}</code>
           </div>
@@ -333,13 +309,13 @@ function EventLogger() {
 
   const addEvent = (message: string) => {
     const timestamp = new Date().toLocaleTimeString();
-    setEvents(prev => [...prev, `[${timestamp}] ${message}`]);
+    setEvents((prev) => [...prev, `[${timestamp}] ${message}`]);
   };
 
   useEffect(() => {
     const unsubscribers = [
       chatbot.onInit(() => {
-        addEvent('Widget initialized and connected');
+        addEvent("Widget initialized and connected");
       }),
 
       chatbot.onMessageReceived((data) => {
@@ -351,12 +327,12 @@ function EventLogger() {
       }),
 
       chatbot.onWidgetPopup((isOpen) => {
-        addEvent(`Widget popup: ${isOpen ? 'opened' : 'closed'}`);
-      })
+        addEvent(`Widget popup: ${isOpen ? "opened" : "closed"}`);
+      }),
     ];
 
     return () => {
-      unsubscribers.forEach(unsub => unsub());
+      unsubscribers.forEach((unsub) => unsub());
     };
   }, [chatbot]);
 
@@ -369,9 +345,7 @@ function EventLogger() {
             {event}
           </div>
         ))}
-        {events.length === 0 && (
-          <div className="log-empty">No events yet...</div>
-        )}
+        {events.length === 0 && <div className="log-empty">No events yet...</div>}
       </div>
     </div>
   );
@@ -549,8 +523,8 @@ const styles = `
 `;
 
 // Inject styles
-const styleSheet = document.createElement('style');
-styleSheet.type = 'text/css';
+const styleSheet = document.createElement("style");
+styleSheet.type = "text/css";
 styleSheet.innerText = styles;
 document.head.appendChild(styleSheet);
 

@@ -2,36 +2,16 @@
  * YourGPT SDK Types
  */
 
-// Core SDK Configuration
-export interface YourGPTConfig {
-  widgetId: string;
-  endpoint?: string;
-  autoLoad?: boolean;
-  debug?: boolean;
-  whitelabel?: boolean;
-}
+import { WidgetState, EventHandler, EventUnsubscriber } from "./core";
 
-// Widget State
-export interface WidgetState {
-  isOpen: boolean;
-  isVisible: boolean;
-  isConnected: boolean;
-  isLoaded: boolean;
-  lastMessageId?: string;
-  messageCount: number;
-  connectionRetries: number;
-}
-
-// Event Types
-export type EventHandler<T = any> = (data: T) => void;
-export type EventUnsubscriber = () => void;
+export * from "./core";
 
 // Message Types
 export interface MessageData {
   id: string;
   content: string;
   timestamp: string;
-  sender: 'user' | 'bot' | 'agent';
+  sender: "user" | "bot" | "agent";
   metadata?: Record<string, any>;
 }
 
@@ -135,13 +115,7 @@ export interface EventListeners {
 }
 
 // Complete Chatbot API
-export interface ChatbotAPI extends 
-  WidgetState,
-  WidgetControls,
-  MessagingControls,
-  AdvancedFeatures,
-  DataManagement,
-  EventListeners {}
+export interface ChatbotAPI extends WidgetState, WidgetControls, MessagingControls, AdvancedFeatures, DataManagement, EventListeners {}
 
 // AI Actions API
 export interface AIActionsAPI {
@@ -167,18 +141,3 @@ declare global {
     YOURGPT_WIDGET_UID?: string;
   }
 }
-
-// Error Types
-export class YourGPTError extends Error {
-  constructor(message: string, public code?: string) {
-    super(message);
-    this.name = 'YourGPTError';
-  }
-}
-
-// Utility Types
-export type DeepPartial<T> = {
-  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
-};
-
-export type RequiredKeys<T, K extends keyof T> = T & Required<Pick<T, K>>;

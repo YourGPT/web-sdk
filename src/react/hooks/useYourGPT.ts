@@ -3,7 +3,7 @@
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { YourGPT, YourGPTSDK } from '../../core/YourGPT';
+import YourGPT, { YourGPTSDK } from '../../core/YourGPT';
 import { YourGPTConfig, WidgetState, YourGPTError } from '../../types';
 
 interface UseYourGPTOptions {
@@ -54,7 +54,7 @@ export function useYourGPT(options: UseYourGPTOptions = {}): UseYourGPTReturn {
       const sdkInstance = await YourGPT.init(initConfig);
       
       // Listen for state changes
-      const unsubscribe = sdkInstance.on('stateChange', (newState) => {
+      const unsubscribe = sdkInstance.on('stateChange', (newState: WidgetState) => {
         setState(newState);
       });
 

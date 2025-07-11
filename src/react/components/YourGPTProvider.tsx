@@ -2,8 +2,8 @@
  * React Provider for YourGPT SDK
  */
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { YourGPT, YourGPTSDK } from '../../core/YourGPT';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import YourGPT, { YourGPTSDK } from '../../core/YourGPT';
 import { YourGPTConfig, YourGPTError, WidgetState } from '../../types';
 
 interface YourGPTContextValue {
@@ -54,7 +54,7 @@ export function YourGPTProvider({
         const sdkInstance = await YourGPT.init(config);
         
         // Listen for state changes
-        const unsubscribe = sdkInstance.on('stateChange', (newState) => {
+        const unsubscribe = sdkInstance.on('stateChange', (newState: WidgetState) => {
           setState(newState);
         });
 

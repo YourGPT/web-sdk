@@ -3,7 +3,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { YourGPT, YourGPTSDK } from '../../core/YourGPT';
+import YourGPT, { YourGPTSDK } from '../../core/YourGPT';
 import { AIActionsAPI, AIActionHandler } from '../../types';
 
 /**

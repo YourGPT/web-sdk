@@ -1,12 +1,12 @@
 /**
  * YourGPT SDK - Main Entry Point
- * 
+ *
  * This is the core SDK that works with vanilla JavaScript/TypeScript
  * For React-specific functionality, use @yourgpt/sdk/react
  */
 
 // Core SDK
-export { YourGPT, YourGPTSDK } from './core/YourGPT';
+export { default as YourGPT, YourGPTSDK } from "./core/YourGPT";
 
 // Types
 export type {
@@ -30,34 +30,17 @@ export type {
   MessagingControls,
   AdvancedFeatures,
   DataManagement,
-  EventListeners
-} from './types';
+  EventListeners,
+} from "./types";
 
 // Error class
-export { YourGPTError } from './types';
+export { YourGPTError } from "./types";
 
 // Utilities
-export {
-  isBrowser,
-  isDevelopment,
-  createDebugLogger,
-  waitFor,
-  withRetry,
-  deepMerge,
-  generateId,
-  validateWidgetId,
-  validateUrl,
-  sanitizeHtml,
-  debounce,
-  throttle,
-  isInViewport,
-  loadScript,
-  loadCSS,
-  EventEmitter
-} from './utils';
+export { isBrowser, isDevelopment, createDebugLogger, waitFor, withRetry, deepMerge, generateId, validateWidgetId, validateUrl, sanitizeHtml, debounce, throttle, isInViewport, loadScript, loadCSS, EventEmitter } from "./utils";
 
 // Version
-export const VERSION = '1.0.0';
+export const VERSION = "1.0.0";
 
-// Default export for convenience
-export default YourGPT;
+// Re-export default
+export { default } from "./core/YourGPT";

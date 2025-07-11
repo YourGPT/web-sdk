@@ -2,33 +2,11 @@
  * YourGPT Core SDK
  */
 
-import { 
-  YourGPTConfig, 
-  YourGPTError,
-  ChatbotAPI,
-  AIActionsAPI,
-  WidgetState,
-  MessageData,
-  EscalationData,
-  SessionData,
-  VisitorData,
-  ContactData,
-  GameOptions,
-  AIActionHandler,
-  EventHandler,
-  EventUnsubscriber
-} from '../types';
-import { 
-  isBrowser, 
-  createDebugLogger, 
-  validateWidgetId, 
-  validateUrl, 
-  loadScript, 
-  loadCSS, 
-  waitFor,
-  EventEmitter,
-  generateId
-} from '../utils';
+import { YourGPTConfig, YourGPTError, WidgetState, EventHandler, EventUnsubscriber } from "../types/core";
+
+import { ChatbotAPI, AIActionsAPI, MessageData, EscalationData, SessionData, VisitorData, ContactData, GameOptions, AIActionHandler } from "../types";
+
+import { isBrowser, createDebugLogger, validateWidgetId, validateUrl, loadScript, loadCSS, waitFor, EventEmitter } from "../utils";
 
 interface YourGPTEvents {
   stateChange: WidgetState;
@@ -41,18 +19,18 @@ interface YourGPTEvents {
 /**
  * Main YourGPT SDK class
  */
-export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
+class YourGPTSDK extends EventEmitter<YourGPTEvents> {
   private static instance: YourGPTSDK | null = null;
   private config: YourGPTConfig | null = null;
   private isInitialized = false;
-  private logger = createDebugLogger('Core');
+  private logger = createDebugLogger("Core");
   private state: WidgetState = {
     isOpen: false,
     isVisible: true,
     isConnected: false,
     isLoaded: false,
     messageCount: 0,
-    connectionRetries: 0
+    connectionRetries: 0,
   };
   private aiActionHandlers = new Map<string, AIActionHandler>();
 
@@ -76,7 +54,7 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
    */
   public async init(config: YourGPTConfig): Promise<YourGPTSDK> {
     if (this.isInitialized) {
-      this.logger.warn('SDK already initialized');
+      this.logger.warn("SDK already initialized");
       return this;
     }
 
@@ -84,7 +62,7 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
     this.validateConfig(config);
 
     this.config = config;
-    this.logger.log('Initializing SDK with config:', config);
+    this.logger.log("Initializing SDK with config:", config);
 
     // Set up global variables
     this.setupGlobalVariables();
@@ -95,7 +73,7 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
     }
 
     this.isInitialized = true;
-    this.logger.log('SDK initialized successfully');
+    this.logger.log("SDK initialized successfully");
 
     return this;
   }
@@ -105,15 +83,15 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
    */
   private validateConfig(config: YourGPTConfig): void {
     if (!config.widgetId) {
-      throw new YourGPTError('Widget ID is required', 'MISSING_WIDGET_ID');
+      throw new YourGPTError("Widget ID is required", "MISSING_WIDGET_ID");
     }
 
     if (!validateWidgetId(config.widgetId)) {
-      throw new YourGPTError('Invalid widget ID format', 'INVALID_WIDGET_ID');
+      throw new YourGPTError("Invalid widget ID format", "INVALID_WIDGET_ID");
     }
 
     if (config.endpoint && !validateUrl(config.endpoint)) {
-      throw new YourGPTError('Invalid endpoint URL', 'INVALID_ENDPOINT');
+      throw new YourGPTError("Invalid endpoint URL", "INVALID_ENDPOINT");
     }
   }
 
@@ -124,7 +102,7 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
     if (!isBrowser()) return;
 
     window.YOURGPT_WIDGET_UID = this.config!.widgetId;
-    
+
     if (!window.$yourgptChatbot) {
       window.$yourgptChatbot = {};
     }
@@ -141,9 +119,7 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
     }
 
     // Default endpoints
-    return this.config?.whitelabel 
-      ? 'https://widget.d4ai.chat'
-      : 'https://widget.yourgpt.ai';
+    return this.config?.whitelabel ? "https://widget.d4ai.chat" : "https://widget.yourgpt.ai";
   }
 
   /**
@@ -151,11 +127,11 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
    */
   private async loadWidget(): Promise<void> {
     if (!isBrowser()) {
-      throw new YourGPTError('Cannot load widget in non-browser environment', 'NOT_BROWSER');
+      throw new YourGPTError("Cannot load widget in non-browser environment", "NOT_BROWSER");
     }
 
     const endpoint = this.getEndpoint();
-    
+
     try {
       // Create root container
       this.createRootContainer();
@@ -170,11 +146,10 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
       await waitFor(() => this.isWidgetReady(), 10000);
 
       this.updateState({ isLoaded: true });
-      this.logger.log('Widget loaded successfully');
-
+      this.logger.log("Widget loaded successfully");
     } catch (error) {
-      this.logger.error('Failed to load widget:', error);
-      throw new YourGPTError('Failed to load widget', 'WIDGET_LOAD_FAILED');
+      this.logger.error("Failed to load widget:", error);
+      throw new YourGPTError("Failed to load widget", "WIDGET_LOAD_FAILED");
     }
   }
 
@@ -182,12 +157,12 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
    * Create root container for widget
    */
   private createRootContainer(): void {
-    if (document.getElementById('yourgpt_root')) {
+    if (document.getElementById("yourgpt_root")) {
       return; // Already exists
     }
 
-    const root = document.createElement('div');
-    root.id = 'yourgpt_root';
+    const root = document.createElement("div");
+    root.id = "yourgpt_root";
     root.style.cssText = `
       position: fixed;
       z-index: 2147483647;
@@ -205,11 +180,7 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
    * Check if widget is ready
    */
   private isWidgetReady(): boolean {
-    return Boolean(
-      window.$yourgptChatbot?.execute &&
-      window.$yourgptChatbot?.on &&
-      window.$yourgptChatbot?.set
-    );
+    return Boolean(window.$yourgptChatbot?.execute && window.$yourgptChatbot?.on && window.$yourgptChatbot?.set);
   }
 
   /**
@@ -223,17 +194,17 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
       window.$yourgptChatbot = {
         q: [],
         execute: (action: string, ...args: any[]) => {
-          window.$yourgptChatbot!.q!.push(['execute', action, ...args]);
+          window.$yourgptChatbot!.q!.push(["execute", action, ...args]);
         },
         on: (event: string, callback: Function) => {
-          window.$yourgptChatbot!.q!.push(['on', event, callback]);
+          window.$yourgptChatbot!.q!.push(["on", event, callback]);
         },
         off: (event: string, callback?: Function) => {
-          window.$yourgptChatbot!.q!.push(['off', event, callback]);
+          window.$yourgptChatbot!.q!.push(["off", event, callback]);
         },
         set: (key: string, value: any) => {
-          window.$yourgptChatbot!.q!.push(['set', key, value]);
-        }
+          window.$yourgptChatbot!.q!.push(["set", key, value]);
+        },
       };
     }
   }
@@ -243,7 +214,7 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
    */
   private updateState(updates: Partial<WidgetState>): void {
     this.state = { ...this.state, ...updates };
-    this.emit('stateChange', this.state);
+    this.emit("stateChange", this.state);
   }
 
   /**
@@ -251,8 +222,8 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
    */
   private executeCommand(command: string, ...args: any[]): void {
     if (!this.isWidgetReady()) {
-      this.logger.warn('Widget not ready, queueing command:', command);
-      window.$yourgptChatbot?.q?.push(['execute', command, ...args]);
+      this.logger.warn("Widget not ready, queueing command:", command);
+      window.$yourgptChatbot?.q?.push(["execute", command, ...args]);
       return;
     }
 
@@ -264,8 +235,8 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
    */
   private registerEventListener(event: string, callback: Function): void {
     if (!this.isWidgetReady()) {
-      this.logger.warn('Widget not ready, queueing event listener:', event);
-      window.$yourgptChatbot?.q?.push(['on', event, callback]);
+      this.logger.warn("Widget not ready, queueing event listener:", event);
+      window.$yourgptChatbot?.q?.push(["on", event, callback]);
       return;
     }
 
@@ -277,8 +248,8 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
    */
   private setWidgetData(key: string, value: any): void {
     if (!this.isWidgetReady()) {
-      this.logger.warn('Widget not ready, queueing data:', key);
-      window.$yourgptChatbot?.q?.push(['set', key, value]);
+      this.logger.warn("Widget not ready, queueing data:", key);
+      window.$yourgptChatbot?.q?.push(["set", key, value]);
       return;
     }
 
@@ -310,12 +281,12 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
    * Widget Controls
    */
   public open(): void {
-    this.executeCommand('widget:open');
+    this.executeCommand("widget:open");
     this.updateState({ isOpen: true });
   }
 
   public close(): void {
-    this.executeCommand('widget:close');
+    this.executeCommand("widget:close");
     this.updateState({ isOpen: false });
   }
 
@@ -328,12 +299,12 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
   }
 
   public show(): void {
-    this.executeCommand('widget:show');
+    this.executeCommand("widget:show");
     this.updateState({ isVisible: true });
   }
 
   public hide(): void {
-    this.executeCommand('widget:hide');
+    this.executeCommand("widget:hide");
     this.updateState({ isVisible: false });
   }
 
@@ -341,33 +312,33 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
    * Messaging
    */
   public sendMessage(text: string, autoSend: boolean = true): void {
-    this.executeCommand('message:send', { text, send: autoSend });
+    this.executeCommand("message:send", { text, send: autoSend });
   }
 
   /**
    * Advanced Features
    */
   public openBottomSheet(url: string): void {
-    this.executeCommand('bottomSheet:open', { url });
+    this.executeCommand("bottomSheet:open", { url });
   }
 
   public startGame(gameId: string, options: GameOptions = {}): void {
-    this.executeCommand('game:start', { id: gameId, ...options });
+    this.executeCommand("game:start", { id: gameId, ...options });
   }
 
   /**
    * Data Management
    */
   public setSessionData(data: SessionData): void {
-    this.setWidgetData('session:data', data);
+    this.setWidgetData("session:data", data);
   }
 
   public setVisitorData(data: VisitorData): void {
-    this.setWidgetData('visitor:data', data);
+    this.setWidgetData("visitor:data", data);
   }
 
   public setContactData(data: ContactData): void {
-    this.setWidgetData('contact:data', data);
+    this.setWidgetData("contact:data", data);
   }
 
   /**
@@ -379,8 +350,8 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
       callback();
     };
 
-    this.registerEventListener('init', wrappedCallback);
-    return () => window.$yourgptChatbot?.off?.('init', wrappedCallback);
+    this.registerEventListener("init", wrappedCallback);
+    return () => window.$yourgptChatbot?.off?.("init", wrappedCallback);
   }
 
   public onMessageReceived(callback: EventHandler<MessageData>): EventUnsubscriber {
@@ -389,13 +360,13 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
       callback(data);
     };
 
-    this.registerEventListener('message:received', wrappedCallback);
-    return () => window.$yourgptChatbot?.off?.('message:received', wrappedCallback);
+    this.registerEventListener("message:received", wrappedCallback);
+    return () => window.$yourgptChatbot?.off?.("message:received", wrappedCallback);
   }
 
   public onEscalatedToHuman(callback: EventHandler<EscalationData>): EventUnsubscriber {
-    this.registerEventListener('escalatedToHuman', callback);
-    return () => window.$yourgptChatbot?.off?.('escalatedToHuman', callback);
+    this.registerEventListener("escalatedToHuman", callback);
+    return () => window.$yourgptChatbot?.off?.("escalatedToHuman", callback);
   }
 
   public onWidgetPopup(callback: EventHandler<boolean>): EventUnsubscriber {
@@ -404,8 +375,8 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
       callback(isOpen);
     };
 
-    this.registerEventListener('widget:popup', wrappedCallback);
-    return () => window.$yourgptChatbot?.off?.('widget:popup', wrappedCallback);
+    this.registerEventListener("widget:popup", wrappedCallback);
+    return () => window.$yourgptChatbot?.off?.("widget:popup", wrappedCallback);
   }
 
   /**
@@ -432,31 +403,31 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
     return {
       // State
       ...this.getState(),
-      
+
       // Widget Controls
       open: this.open.bind(this),
       close: this.close.bind(this),
       toggle: this.toggle.bind(this),
       show: this.show.bind(this),
       hide: this.hide.bind(this),
-      
+
       // Messaging
       sendMessage: this.sendMessage.bind(this),
-      
+
       // Advanced Features
       openBottomSheet: this.openBottomSheet.bind(this),
       startGame: this.startGame.bind(this),
-      
+
       // Data Management
       setSessionData: this.setSessionData.bind(this),
       setVisitorData: this.setVisitorData.bind(this),
       setContactData: this.setContactData.bind(this),
-      
+
       // Event Listeners
       onInit: this.onInit.bind(this),
       onMessageReceived: this.onMessageReceived.bind(this),
       onEscalatedToHuman: this.onEscalatedToHuman.bind(this),
-      onWidgetPopup: this.onWidgetPopup.bind(this)
+      onWidgetPopup: this.onWidgetPopup.bind(this),
     };
   }
 
@@ -475,7 +446,7 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
       getRegisteredActions: this.getRegisteredAIActions.bind(this),
       get registeredActions() {
         return this.getRegisteredActions();
-      }
+      },
     };
   }
 
@@ -494,7 +465,7 @@ export class YourGPTSDK extends EventEmitter<YourGPTEvents> {
 /**
  * Static methods for easier usage
  */
-export const YourGPT = {
+const YourGPT = {
   /**
    * Initialize the SDK
    */
@@ -508,5 +479,8 @@ export const YourGPT = {
    */
   getInstance: () => {
     return YourGPTSDK.getInstance();
-  }
+  },
 };
+
+export { YourGPTSDK };
+export default YourGPT;

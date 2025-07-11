@@ -14,7 +14,7 @@ export { YourGPTProvider, useYourGPTContext } from './components/YourGPTProvider
 export { YourGPTWidget } from './components/YourGPTWidget';
 
 // Re-export core SDK for convenience
-export { YourGPT, YourGPTSDK } from '../core/YourGPT';
+export { default as YourGPT, YourGPTSDK } from '../core/YourGPT';
 
 // Re-export types
 export type {

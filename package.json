@@ -14,22 +14,24 @@
   ],
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js"
     },
     "./react": {
+      "types": "./react/dist/index.d.ts",
       "import": "./react/dist/index.mjs",
-      "require": "./react/dist/index.js",
-      "types": "./react/dist/index.d.ts"
+      "require": "./react/dist/index.js"
     }
   },
   "scripts": {
     "build": "npm run build:core && npm run build:react",
     "build:core": "tsup src/index.ts --format cjs,esm --dts",
-    "build:react": "tsup src/react/index.ts --format cjs,esm --dts --outdir react/dist",
+    "build:react": "tsup --config tsup.react.config.ts",
     "dev": "npm run build:core -- --watch",
     "dev:react": "npm run build:react -- --watch",
+    "serve": "npx serve . -p 3000",
+    "dev:examples": "npm run build && npm run serve",
     "type-check": "tsc --noEmit",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",

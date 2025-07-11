@@ -2,8 +2,8 @@
  * React Component for YourGPT Widget
  */
 
-import React, { useEffect, useRef } from 'react';
-import { YourGPT } from '../../core/YourGPT';
+import { useEffect, useRef } from 'react';
+import YourGPT from '../../core/YourGPT';
 import { YourGPTConfig, YourGPTError } from '../../types';
 
 interface YourGPTWidgetProps {

@@ -513,6 +513,28 @@ npm install
 npm run build
 ```
 
+### Testing & Examples
+
+#### Vanilla JavaScript Testing
+```bash
+# Build and serve examples
+npm run dev:examples
+
+# Open http://localhost:3000/examples/vanilla/index.html
+```
+
+#### React Testing
+```bash
+# Build the SDK first
+npm run build
+
+# Go to React example directory
+cd examples/react && npm install
+
+# Start the development server
+npm run dev
+```
+
 ### Available Scripts
 
 ```bash
@@ -520,6 +542,8 @@ npm run build          # Build both core and React packages
 npm run build:core     # Build core SDK only
 npm run build:react    # Build React package only
 npm run dev            # Development mode with watch
+npm run dev:examples   # Build and serve examples
+npm run serve          # Serve examples on port 3000
 npm run type-check     # TypeScript type checking
 npm run lint           # ESLint code linting
 npm run lint:fix       # Fix ESLint issues
