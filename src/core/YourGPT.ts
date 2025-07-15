@@ -165,12 +165,7 @@ class YourGPTSDK extends EventEmitter<YourGPTEvents> {
     root.id = "yourgpt_root";
     root.style.cssText = `
       position: fixed;
-      z-index: 2147483647;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
+      z-index: 99999;
     `;
 
     document.body.appendChild(root);
