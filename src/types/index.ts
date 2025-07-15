@@ -50,13 +50,15 @@ export interface ContactData {
 
 // AI Actions Types
 export interface AIActionData {
-  action: Array<{
-    function: {
-      arguments: string;
-      name: string;
+  action: {
+    tool?: {
+      function?: {
+        arguments: string;
+        name: string;
+      };
     };
     id: string;
-  }>;
+  };
   session_data: {
     session_uid: number;
     [key: string]: any;

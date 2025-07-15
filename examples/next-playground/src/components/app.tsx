@@ -6,11 +6,11 @@ import { Todo } from "@/types/todo";
 import { Navigation } from "@/components/navigation";
 import { TodoList } from "@/components/todo-app";
 import { KanbanBoard } from "@/components/kanban-board";
-import { YourGPT, useAIActions } from "@yourgpt/sdk/react";
+import { YourGPT, useAIActions } from "@yourgpt/widget-web-sdk/react";
 
 // Initialize SDK
 YourGPT.init({
-  widgetId: process.env.NEXT_PUBLIC_WIDGET_ID!,
+  widgetId: process.env.NEXT_PUBLIC_WIDGET_UID!,
   endpoint: process.env.NEXT_PUBLIC_WIDGET_ENDPOINT!,
   debug: true,
 });
