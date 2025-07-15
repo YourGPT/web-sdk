@@ -4,7 +4,7 @@ import { YourGPT, useYourGPTChatbot, useAIActions } from "@yourgpt/sdk/react";
 // Initialize SDK
 YourGPT.init({
   widgetId: "232d2602-7cbd-4f6a-87eb-21058599d594",
-  endpoint: "https://widget.yourgpt.ai",
+  endpoint: "https://dev-widget.yourgpt.ai",
   debug: true,
 });
 
@@ -115,29 +115,27 @@ function UserProfile() {
   // Update chatbot data when user data changes
   useEffect(() => {
     // Set contact data (user identity)
-    chatbot.setContactData({
-      email: userData.email,
-      name: userData.name,
-      user_hash: `user_${userData.id}`,
-    });
-
+    // chatbot.setContactData({
+    //   email: userData.email,
+    //   name: userData.name,
+    //   user_hash: `user_${userData.id}`,
+    // });
     // Set session data (temporary data for this session)
-    chatbot.setSessionData({
-      userId: userData.id,
-      plan: userData.plan,
-      sessionStart: new Date().toISOString(),
-      features: userData.plan === "pro" ? ["ai-actions", "games", "priority-support"] : ["basic-chat"],
-      preferences: userData.preferences,
-    });
-
+    // chatbot.setSessionData({
+    //   userId: userData.id,
+    //   plan: userData.plan,
+    //   sessionStart: new Date().toISOString(),
+    //   features: userData.plan === "pro" ? ["ai-actions", "games", "priority-support"] : ["basic-chat"],
+    //   preferences: userData.preferences,
+    // });
     // Set visitor data (analytics/tracking data)
-    chatbot.setVisitorData({
-      source: "react-demo",
-      userAgent: navigator.userAgent,
-      referrer: document.referrer,
-      viewport: `${window.innerWidth}x${window.innerHeight}`,
-      timestamp: new Date().toISOString(),
-    });
+    // chatbot.setVisitorData({
+    //   source: "react-demo",
+    //   userAgent: navigator.userAgent,
+    //   referrer: document.referrer,
+    //   viewport: `${window.innerWidth}x${window.innerHeight}`,
+    //   timestamp: new Date().toISOString(),
+    // });
   }, [userData, chatbot]);
 
   const updatePreferences = (key: string, value: any) => {
@@ -234,50 +232,50 @@ function AIActionsDemo() {
       );
     });
 
-    // Register React component info action
-    aiActions.registerAction("get_react_info", async (data, helpers) => {
-      const reactInfo = {
-        version: React.version,
-        mode: process.env.NODE_ENV,
-        components: ["App", "ChatControls", "UserProfile", "AIActionsDemo", "EventLogger"],
-        hooks: ["useYourGPTChatbot", "useAIActions"],
-        timestamp: new Date().toISOString(),
-      };
+    // // Register React component info action
+    // aiActions.registerAction("get_react_info", async (data, helpers) => {
+    //   const reactInfo = {
+    //     version: React.version,
+    //     mode: process.env.NODE_ENV,
+    //     components: ["App", "ChatControls", "UserProfile", "AIActionsDemo", "EventLogger"],
+    //     hooks: ["useYourGPTChatbot", "useAIActions"],
+    //     timestamp: new Date().toISOString(),
+    //   };
 
-      helpers.respond(`React App Information:\n${JSON.stringify(reactInfo, null, 2)}`);
-    });
+    //   helpers.respond(`React App Information:\n${JSON.stringify(reactInfo, null, 2)}`);
+    // });
 
-    // Register system info action
-    aiActions.registerAction("get_system_info", async (data, helpers) => {
-      const systemInfo = {
-        userAgent: navigator.userAgent,
-        language: navigator.language,
-        platform: navigator.platform,
-        screenSize: `${screen.width}x${screen.height}`,
-        windowSize: `${window.innerWidth}x${window.innerHeight}`,
-        url: window.location.href,
-        timestamp: new Date().toISOString(),
-      };
+    // // Register system info action
+    // aiActions.registerAction("get_system_info", async (data, helpers) => {
+    //   const systemInfo = {
+    //     userAgent: navigator.userAgent,
+    //     language: navigator.language,
+    //     platform: navigator.platform,
+    //     screenSize: `${screen.width}x${screen.height}`,
+    //     windowSize: `${window.innerWidth}x${window.innerHeight}`,
+    //     url: window.location.href,
+    //     timestamp: new Date().toISOString(),
+    //   };
 
-      helpers.respond(`System Information:\n${JSON.stringify(systemInfo, null, 2)}`);
-    });
+    //   helpers.respond(`System Information:\n${JSON.stringify(systemInfo, null, 2)}`);
+    // });
 
-    // Register batch actions
-    aiActions.registerActions({
-      get_page_title: async (data, helpers) => {
-        helpers.respond(`Page title: ${document.title}`);
-      },
+    // // Register batch actions
+    // aiActions.registerActions({
+    //   get_page_title: async (data, helpers) => {
+    //     helpers.respond(`Page title: ${document.title}`);
+    //   },
 
-      scroll_to_top: async (data, helpers) => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        helpers.respond("Scrolled to top of page");
-      },
+    //   scroll_to_top: async (data, helpers) => {
+    //     window.scrollTo({ top: 0, behavior: "smooth" });
+    //     helpers.respond("Scrolled to top of page");
+    //   },
 
-      get_current_time: async (data, helpers) => {
-        const now = new Date();
-        helpers.respond(`Current time: ${now.toLocaleString()}`);
-      },
-    });
+    //   get_current_time: async (data, helpers) => {
+    //     const now = new Date();
+    //     helpers.respond(`Current time: ${now.toLocaleString()}`);
+    //   },
+    // });
 
     // Update initial state
     updateRegisteredActions();
@@ -285,11 +283,11 @@ function AIActionsDemo() {
     // Cleanup on unmount
     return () => {
       aiActions.unregisterAction("get_location");
-      aiActions.unregisterAction("get_react_info");
-      aiActions.unregisterAction("get_system_info");
-      aiActions.unregisterAction("get_page_title");
-      aiActions.unregisterAction("scroll_to_top");
-      aiActions.unregisterAction("get_current_time");
+      // aiActions.unregisterAction("get_react_info");
+      // aiActions.unregisterAction("get_system_info");
+      // aiActions.unregisterAction("get_page_title");
+      // aiActions.unregisterAction("scroll_to_top");
+      // aiActions.unregisterAction("get_current_time");
     };
   }, []);
 

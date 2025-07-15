@@ -1,6 +1,6 @@
 {
   "name": "@yourgpt/widget-web-sdk",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Official YourGPT SDK for JavaScript/TypeScript and React applications",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -44,7 +44,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourgpt/sdk.git"
+    "url": "git+https://github.com/YourGPT/web-sdk.git"
   },
   "keywords": [
     "yourgpt",
@@ -59,9 +59,9 @@
   "author": "YourGPT <support@yourgpt.ai>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/yourgpt/sdk/issues"
+    "url": "https://github.com/YourGPT/web-sdk/issues"
   },
-  "homepage": "https://github.com/yourgpt/sdk#readme",
+  "homepage": "https://github.com/YourGPT/web-sdk#readme",
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/react": "^18.0.0",
