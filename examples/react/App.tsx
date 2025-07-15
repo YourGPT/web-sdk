@@ -3,8 +3,8 @@ import { YourGPT, useYourGPTChatbot, useAIActions } from "@yourgpt/sdk/react";
 
 // Initialize SDK
 YourGPT.init({
-  widgetId: "232d2602-7cbd-4f6a-87eb-21058599d594",
-  endpoint: "https://dev-widget.yourgpt.ai",
+  widgetId: process.env.VITE_WIDGET_UID!,
+  endpoint: process.env.VITE_WIDGET_ENDPOINT!,
   debug: true,
 });
 
