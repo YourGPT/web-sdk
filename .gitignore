@@ -43,6 +43,9 @@ package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
+.env.local
+.env
+
 # Test files
 *.test.js
 *.test.ts
