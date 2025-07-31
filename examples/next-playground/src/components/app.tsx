@@ -12,6 +12,10 @@ interface AppProps {
   view: "list" | "kanban";
 }
 
+YourGPT.init({
+  widgetId: "your-widget-id",
+});
+
 export function App({ view }: AppProps) {
   const currentView = view;
   const [todos, setTodos] = useState<Todo[]>([]);
