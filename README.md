@@ -37,7 +37,6 @@ import { YourGPT } from "@yourgpt/widget-web-sdk";
 // Initialize the SDK
 await YourGPT.init({
   widgetId: "your-widget-id",
-  endpoint: "https://widget.yourgpt.ai",
 });
 
 // Get the SDK instance
@@ -61,7 +60,6 @@ import { YourGPT, useYourGPTChatbot, useAIActions } from "@yourgpt/widget-web-sd
 // Initialize in your main app file (main.tsx or App.tsx)
 YourGPT.init({
   widgetId: "your-widget-id",
-  endpoint: "https://widget.yourgpt.ai",
 });
 
 // Use in components
@@ -331,8 +329,6 @@ function App() {
     <YourGPTProvider
       config={{
         widgetId: "your-widget-id",
-        endpoint: "https://widget.yourgpt.ai",
-        debug: process.env.NODE_ENV === "development",
       }}
       onInitialized={(sdk) => {
         console.log("SDK initialized:", sdk);

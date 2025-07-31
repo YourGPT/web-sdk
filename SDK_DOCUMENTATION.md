@@ -52,6 +52,7 @@ npm install @yourgpt/react-sdk
 **Purpose**: Initialize the widget loader and set up the global API.
 
 **Detailed Flow**:
+
 1. **Document Detection**: Checks if `document` exists (SSR safety)
 2. **Script Tag Discovery**: Searches for `#yourgpt-chatbot` or `#ygc-chatbot`
 3. **Endpoint Selection**: Chooses between standard or whitelabel endpoints
@@ -64,6 +65,7 @@ npm install @yourgpt/react-sdk
 7. **Module Loading**: Loads main chatbot bundle as ES module
 
 **Global API Setup**:
+
 ```javascript
 window.$yourgptChatbot = {
   q: [],                    // Command queue
@@ -75,6 +77,7 @@ window.$yourgptChatbot = {
 ```
 
 **Error Handling**:
+
 - Missing document → Early return with log
 - Missing script tag → Warning but continues
 - Missing widget ID → Error and early return
@@ -85,6 +88,7 @@ window.$yourgptChatbot = {
 **Purpose**: Handle commands before widget fully loads.
 
 **Mechanism**:
+
 1. Commands are pushed to `q` array
 2. Each command is `[action, method, ...args]` format
 3. SdkManager processes queue when ready
@@ -97,16 +101,13 @@ window.$yourgptChatbot = {
 ```typescript
 // Command Types
 type Action = "set" | "execute" | "on" | "off" | "registerAIAction";
-type Method = "init" | "widget:open" | "widget:close" | "widget:popup" | 
-              "widget:show" | "widget:hide" | "message:send" | 
-              "bottomSheet:open" | "bottomSheet:close" | "escalatedToHuman" | 
-              "game:start";
+type Method = "init" | "widget:open" | "widget:close" | "widget:popup" | "widget:show" | "widget:hide" | "message:send" | "bottomSheet:open" | "bottomSheet:close" | "escalatedToHuman" | "game:start";
 
 // State Management
-const listeners: Listener = {};           // Event listeners registry
-const sessionSetQueue: any[] = [];       // Session data queue
-const visitorSetQueue: any[] = [];       // Visitor data queue
-const contactSetQueue: any[] = [];       // Contact data queue
+const listeners: Listener = {}; // Event listeners registry
+const sessionSetQueue: any[] = []; // Session data queue
+const visitorSetQueue: any[] = []; // Visitor data queue
+const contactSetQueue: any[] = []; // Contact data queue
 ```
 
 ### Function: `handleSet(method, arg)`
@@ -116,6 +117,7 @@ const contactSetQueue: any[] = [];       // Contact data queue
 **Detailed Behavior**:
 
 #### Session Data Setting (`session:data`)
+
 ```typescript
 // Flow:
 if (method === "session:data") {
@@ -124,7 +126,7 @@ if (method === "session:data") {
     socketManager.setSessionData({
       widget_uid: widgetUid,
       session_uid: activeSession.session_uid,
-      data: arg
+      data: arg,
     });
   } else {
     // Queue for later processing
@@ -134,21 +136,23 @@ if (method === "session:data") {
 ```
 
 **React SDK Usage**:
+
 ```typescript
 // Hook implementation
 const setSessionData = useCallback((data: object) => {
-  window.$yourgptChatbot?.set('session:data', data);
+  window.$yourgptChatbot?.set("session:data", data);
 }, []);
 
 // User usage
 chatbot.setSessionData({
   userId: "123",
   plan: "premium",
-  preferences: { theme: "dark" }
+  preferences: { theme: "dark" },
 });
 ```
 
 #### Visitor Data Setting (`visitor:data`)
+
 ```typescript
 // Flow:
 if (method === "visitor:data") {
@@ -157,7 +161,7 @@ if (method === "visitor:data") {
     socketManager.setVisitorData({
       widget_uid: widgetUid,
       visitor_uid: visitorUid,
-      data: arg
+      data: arg,
     });
   } else {
     // Queue for later
@@ -167,17 +171,19 @@ if (method === "visitor:data") {
 ```
 
 **React SDK Usage**:
+
 ```typescript
 // Analytics and tracking data
 chatbot.setVisitorData({
   source: "google",
   campaign: "summer2024",
   pageViews: 5,
-  timeOnSite: 180
+  timeOnSite: 180,
 });
 ```
 
 #### Contact Data Setting (`contact:data`)
+
 ```typescript
 // Flow:
 if (method === "contact:data") {
@@ -186,18 +192,18 @@ if (method === "contact:data") {
     console.error("To set contact data, email or phone is required");
     return;
   }
-  
+
   // Handle user_hash for identity
   if (arg?.user_hash) {
     setUserHash(arg.user_hash);
   }
-  
+
   // Send or queue
   if (visitorUid) {
     socketManager.setContactData({
       widget_uid: widgetUid,
       visitor_uid: visitorUid,
-      data: arg
+      data: arg,
     });
   } else {
     contactSetQueue.push({ data: arg });
@@ -206,13 +212,14 @@ if (method === "contact:data") {
 ```
 
 **React SDK Usage**:
+
 ```typescript
 // User identification
 chatbot.setContactData({
   email: "user@example.com",
   name: "John Doe",
   phone: "+1234567890",
-  user_hash: "secure-hash-for-identity"
+  user_hash: "secure-hash-for-identity",
 });
 ```
 
@@ -223,72 +230,78 @@ chatbot.setContactData({
 #### Widget Control Commands
 
 **`widget:open`**
+
 ```typescript
 // Internal flow:
 toggleChatbotPopup(true);
 
 // React SDK usage:
 const open = useCallback(() => {
-  window.$yourgptChatbot?.execute('widget:open');
+  window.$yourgptChatbot?.execute("widget:open");
 }, []);
 ```
 
 **`widget:close`**
+
 ```typescript
 // Internal flow:
 toggleChatbotPopup(false);
 
 // React SDK usage:
 const close = useCallback(() => {
-  window.$yourgptChatbot?.execute('widget:close');
+  window.$yourgptChatbot?.execute("widget:close");
 }, []);
 ```
 
 **`widget:show`** / **`widget:hide`**
+
 ```typescript
 // Internal flow:
-setChatbotVisible(true/false);
+setChatbotVisible(true / false);
 
 // React SDK usage:
-const show = () => window.$yourgptChatbot?.execute('widget:show');
-const hide = () => window.$yourgptChatbot?.execute('widget:hide');
+const show = () => window.$yourgptChatbot?.execute("widget:show");
+const hide = () => window.$yourgptChatbot?.execute("widget:hide");
 ```
 
 #### Message Sending (`message:send`)
+
 ```typescript
 // Internal flow:
 if (args?.text) {
   setExecution({
     data: {
       text: args.text,
-      send: args.send    // Auto-send flag
+      send: args.send, // Auto-send flag
     },
-    type: "message:send"
+    type: "message:send",
   });
-  toggleChatbotPopup(true);  // Auto-open chat
+  toggleChatbotPopup(true); // Auto-open chat
 }
 
 // React SDK usage:
 const sendMessage = useCallback((text: string, autoSend = true) => {
-  window.$yourgptChatbot?.execute('message:send', { text, send: autoSend });
+  window.$yourgptChatbot?.execute("message:send", { text, send: autoSend });
 }, []);
 ```
 
 #### Bottom Sheet Operations (`bottomSheet:open`)
+
 ```typescript
 // Internal flow:
-bottomSheetContext.openBottomSheet({ 
-  render: "url", 
-  data: { url: args.url } 
+bottomSheetContext.openBottomSheet({
+  render: "url",
+  data: { url: args.url },
 });
 
 // React SDK usage:
 const openBottomSheet = useCallback((url: string) => {
-  window.$yourgptChatbot?.execute('bottomSheet:open', { url });
+  window.$yourgptChatbot?.execute("bottomSheet:open", { url });
 }, []);
 ```
 
 #### Game Integration (`game:start`)
+
 ```typescript
 // Internal flow:
 const { id, showExitConfirmation, leadCapture, gameConfig } = args;
@@ -302,26 +315,26 @@ switch (id) {
     gameContext.playGame({ gameId: GameType.EMOJI_RIDDLE, showExitConfirmation });
     break;
   case "guessMoji":
-    gameContext.playGame({ 
-      gameId: GameType.GUESS_MOJI, 
-      showExitConfirmation, 
-      leadCapture, 
-      gameConfig 
+    gameContext.playGame({
+      gameId: GameType.GUESS_MOJI,
+      showExitConfirmation,
+      leadCapture,
+      gameConfig,
     });
     break;
   case "quizMania":
-    gameContext.playGame({ 
-      gameId: GameType.QUIZ_MANIA, 
-      showExitConfirmation, 
-      leadCapture, 
-      gameConfig 
+    gameContext.playGame({
+      gameId: GameType.QUIZ_MANIA,
+      showExitConfirmation,
+      leadCapture,
+      gameConfig,
     });
     break;
 }
 
 // React SDK usage:
 const startGame = useCallback((gameId: string, options = {}) => {
-  window.$yourgptChatbot?.execute('game:start', { id: gameId, ...options });
+  window.$yourgptChatbot?.execute("game:start", { id: gameId, ...options });
 }, []);
 ```
 
@@ -330,11 +343,12 @@ const startGame = useCallback((gameId: string, options = {}) => {
 **Purpose**: Event listener management.
 
 #### AI Action Event Handling
+
 ```typescript
 // Internal flow for AI actions:
 if (method.startsWith("ai:action:")) {
   const actionName = method.replace("ai:action:", "");
-  aiActionsSdk.on(actionName, handler);  // or .off()
+  aiActionsSdk.on(actionName, handler); // or .off()
   return;
 }
 
@@ -347,40 +361,43 @@ if (typeof handler === "function") {
 #### Event Types and Triggers
 
 **`init`** - Fired when socket connects
+
 ```typescript
 // Internal trigger:
 useEffect(() => {
   if (socketConnected) {
     const init = listeners.init || [];
-    init.forEach(callback => callback());
+    init.forEach((callback) => callback());
   }
 }, [socketConnected]);
 
 // React SDK usage:
 useEffect(() => {
   chatbot.onInit(() => {
-    console.log('Widget initialized and ready');
+    console.log("Widget initialized and ready");
   });
 }, []);
 ```
 
 **`widget:popup`** - Fired when widget opens/closes
+
 ```typescript
 // Internal trigger:
 useEffect(() => {
   const widgetPopup = listeners["widget:popup"] || [];
-  widgetPopup.forEach(callback => callback(chatbotPopup));
+  widgetPopup.forEach((callback) => callback(chatbotPopup));
 }, [chatbotPopup]);
 
 // React SDK usage:
 useEffect(() => {
   chatbot.onWidgetPopup((isOpen) => {
-    console.log('Widget is', isOpen ? 'open' : 'closed');
+    console.log("Widget is", isOpen ? "open" : "closed");
   });
 }, []);
 ```
 
 **`message:received`** - Fired when message arrives
+
 ```typescript
 // Internal trigger:
 useEffect(() => {
@@ -391,34 +408,33 @@ useEffect(() => {
 
 const handleMessageReceived = useCallback((data: any) => {
   const messageReceived = listeners["message:received"] || [];
-  messageReceived.forEach(callback => callback(data));
+  messageReceived.forEach((callback) => callback(data));
 }, []);
 
 // React SDK usage:
 useEffect(() => {
   chatbot.onMessageReceived((data) => {
-    console.log('New message:', data);
+    console.log("New message:", data);
     // Handle notifications, analytics, etc.
   });
 }, []);
 ```
 
 **`escalatedToHuman`** - Fired when chat mode changes to human
+
 ```typescript
 // Internal trigger:
 const handleModeChanged = useCallback((data: any) => {
   if (data?.chat_mode !== undefined) {
-    const newMode = Object.values(ChatBotModeE).find(mode => mode === data.chat_mode);
-    
+    const newMode = Object.values(ChatBotModeE).find((mode) => mode === data.chat_mode);
+
     if (newMode === ChatBotModeE.awaiting) {
       const escalatedToHumanListeners = listeners["escalatedToHuman"] || [];
-      escalatedToHumanListeners.forEach(callback => {
+      escalatedToHumanListeners.forEach((callback) => {
         callback({
           ...data,
           mode: newMode,
-          modeKey: Object.keys(ChatBotModeE).find(key => 
-            ChatBotModeE[key as keyof typeof ChatBotModeE] === newMode
-          )
+          modeKey: Object.keys(ChatBotModeE).find((key) => ChatBotModeE[key as keyof typeof ChatBotModeE] === newMode),
         });
       });
     }
@@ -428,7 +444,7 @@ const handleModeChanged = useCallback((data: any) => {
 // React SDK usage:
 useEffect(() => {
   chatbot.onEscalatedToHuman((data) => {
-    console.log('Escalated to human agent:', data);
+    console.log("Escalated to human agent:", data);
     // Show notification, update UI, etc.
   });
 }, []);
@@ -439,6 +455,7 @@ useEffect(() => {
 **Purpose**: Handle commands sent before widget is fully loaded.
 
 #### Session Queue Processing
+
 ```typescript
 useEffect(() => {
   if (activeSession?.session_uid) {
@@ -447,7 +464,7 @@ useEffect(() => {
       socketManager.setSessionData({
         widget_uid: widgetUid,
         session_uid: activeSession.session_uid,
-        ...data
+        ...data,
       });
     }
   }
@@ -455,6 +472,7 @@ useEffect(() => {
 ```
 
 #### Visitor Queue Processing
+
 ```typescript
 useEffect(() => {
   if (visitorUid) {
@@ -463,7 +481,7 @@ useEffect(() => {
       socketManager.setVisitorData({
         widget_uid: widgetUid,
         visitor_uid: visitorUid,
-        ...data
+        ...data,
       });
     }
   }
@@ -471,6 +489,7 @@ useEffect(() => {
 ```
 
 #### Contact Queue Processing
+
 ```typescript
 useEffect(() => {
   if (visitorUid) {
@@ -479,7 +498,7 @@ useEffect(() => {
       socketManager.setContactData({
         widget_uid: widgetUid,
         visitor_uid: visitorUid,
-        ...data
+        ...data,
       });
     }
   }
@@ -491,18 +510,19 @@ useEffect(() => {
 **Purpose**: Handle AI-powered actions from the chatbot.
 
 #### Socket Event Handling
+
 ```typescript
 useEffect(() => {
   if (socketConnected) {
     // Set widget UID for AI actions
     aiActionsSdk.setWidgetUid(widgetUid);
-    
+
     // Listen for AI actions from server
     socketManager.socket.on(SocketListenE.aiAction, (data: ActionRecData) => {
       aiActionsSdk.handleAction(data);
     });
   }
-  
+
   return () => {
     socketManager.socket.off(SocketListenE.aiAction);
   };
@@ -510,6 +530,7 @@ useEffect(() => {
 ```
 
 #### AI Action Registration
+
 ```typescript
 // In handleOn for AI actions:
 if (method.startsWith("ai:action:")) {
@@ -519,17 +540,17 @@ if (method.startsWith("ai:action:")) {
 
 // React SDK usage:
 const aiActions = useAIActions();
-aiActions.registerAction('get_location', async (data, helpers) => {
+aiActions.registerAction("get_location", async (data, helpers) => {
   const confirmed = await helpers.confirm({
-    title: 'Location Access',
-    description: 'Allow location access?'
+    title: "Location Access",
+    description: "Allow location access?",
   });
-  
+
   if (confirmed) {
     // Get location and respond
     helpers.respond(`Location: ${lat}, ${lng}`);
   } else {
-    helpers.respond('Location access denied');
+    helpers.respond("Location access denied");
   }
 });
 ```
@@ -540,29 +561,22 @@ aiActions.registerAction('get_location', async (data, helpers) => {
 
 ```typescript
 // main.tsx or App.tsx
-import { YourGPT } from '@yourgpt/react-sdk';
+import { YourGPT } from "@yourgpt/react-sdk";
 
 YourGPT.init({
-  widgetId: 'your-widget-id',
-  endpoint: 'https://widget.yourgpt.ai', // optional
-  autoLoad: true, // optional
-  debug: false // optional
+  widgetId: "your-widget-id",
 });
 ```
 
 ### 2. Basic Usage
 
 ```typescript
-import { useYourGPTChatbot } from '@yourgpt/react-sdk';
+import { useYourGPTChatbot } from "@yourgpt/react-sdk";
 
 function ChatButton() {
   const chatbot = useYourGPTChatbot();
 
-  return (
-    <button onClick={chatbot.open}>
-      Open Chat
-    </button>
-  );
+  return <button onClick={chatbot.open}>Open Chat</button>;
 }
 ```
 
@@ -573,6 +587,7 @@ function ChatButton() {
 **Purpose**: Initialize the React SDK and set up the widget infrastructure.
 
 **Implementation**:
+
 ```typescript
 class YourGPTSDK {
   private static instance: YourGPTSDK;
@@ -589,12 +604,12 @@ class YourGPTSDK {
   private initialize(config: YourGPTConfig) {
     this.config = config;
     this.isInitialized = true;
-    
+
     // Mirror script.js behavior
     window.YOURGPT_WIDGET_UID = config.widgetId;
     window.$yourgptChatbot = {
       ...(window.$yourgptChatbot || {}),
-      WIDGET_ENDPOINT: config.endpoint || 'https://widget.yourgpt.ai',
+      WIDGET_ENDPOINT: config.endpoint || "https://widget.yourgpt.ai",
     };
 
     // Optionally load widget immediately
@@ -607,31 +622,31 @@ class YourGPTSDK {
 
   private loadWidget() {
     // Dynamic loading logic similar to script.js
-    const endpoint = this.config?.endpoint || 'https://widget.yourgpt.ai';
-    
+    const endpoint = this.config?.endpoint || "https://widget.yourgpt.ai";
+
     // Create root container
-    if (!document.getElementById('yourgpt_root')) {
-      const root = document.createElement('div');
-      root.style.zIndex = '99999999999';
-      root.style.position = 'fixed';
-      root.id = 'yourgpt_root';
+    if (!document.getElementById("yourgpt_root")) {
+      const root = document.createElement("div");
+      root.style.zIndex = "99999999999";
+      root.style.position = "fixed";
+      root.id = "yourgpt_root";
       document.body?.appendChild(root);
     }
 
     // Load CSS
     if (!document.querySelector(`link[href="${endpoint}/chatbot.css"]`)) {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
       link.href = `${endpoint}/chatbot.css`;
       document.head?.appendChild(link);
     }
 
     // Load JS bundle
     if (!document.querySelector(`script[src="${endpoint}/chatbot.js"]`)) {
-      const script = document.createElement('script');
+      const script = document.createElement("script");
       script.src = `${endpoint}/chatbot.js`;
       script.async = true;
-      script.type = 'module';
+      script.type = "module";
       document.head?.appendChild(script);
     }
   }
@@ -639,24 +654,23 @@ class YourGPTSDK {
 ```
 
 **Configuration Options**:
+
 ```typescript
 interface YourGPTConfig {
-  widgetId: string;        // Required: Your widget ID
-  endpoint?: string;       // Optional: Custom endpoint
-  autoLoad?: boolean;      // Optional: Auto-load widget (default: true)
-  debug?: boolean;         // Optional: Enable debug mode (default: false)
-  whitelabel?: boolean;    // Optional: Use whitelabel endpoint
+  widgetId: string; // Required: Your widget ID
+  endpoint?: string; // Optional: Custom endpoint
+  autoLoad?: boolean; // Optional: Auto-load widget (default: true)
+  debug?: boolean; // Optional: Enable debug mode (default: false)
+  whitelabel?: boolean; // Optional: Use whitelabel endpoint
 }
 ```
 
 **Usage Example**:
+
 ```typescript
 // main.tsx or App.tsx
 YourGPT.init({
-  widgetId: 'eb2a98b4-0809-4b5a-9134-bef1166af8fb',
-  endpoint: 'https://widget.yourgpt.ai',
-  autoLoad: true,
-  debug: process.env.NODE_ENV === 'development'
+  widgetId: "eb2a98b4-0809-4b5a-9134-bef1166af8fb",
 });
 ```
 
@@ -665,6 +679,7 @@ YourGPT.init({
 **Purpose**: Provide React-friendly access to all widget functionality.
 
 **Implementation**:
+
 ```typescript
 export function useYourGPTChatbot() {
   const [state, setState] = useState<ChatbotState>({
@@ -675,79 +690,94 @@ export function useYourGPTChatbot() {
   });
 
   // Widget control functions
-  const widgetControls = useMemo(() => ({
-    open: () => window.$yourgptChatbot?.execute('widget:open'),
-    close: () => window.$yourgptChatbot?.execute('widget:close'),
-    toggle: () => {
-      if (state.isOpen) {
-        window.$yourgptChatbot?.execute('widget:close');
-      } else {
-        window.$yourgptChatbot?.execute('widget:open');
-      }
-    },
-    show: () => window.$yourgptChatbot?.execute('widget:show'),
-    hide: () => window.$yourgptChatbot?.execute('widget:hide'),
-  }), [state.isOpen]);
+  const widgetControls = useMemo(
+    () => ({
+      open: () => window.$yourgptChatbot?.execute("widget:open"),
+      close: () => window.$yourgptChatbot?.execute("widget:close"),
+      toggle: () => {
+        if (state.isOpen) {
+          window.$yourgptChatbot?.execute("widget:close");
+        } else {
+          window.$yourgptChatbot?.execute("widget:open");
+        }
+      },
+      show: () => window.$yourgptChatbot?.execute("widget:show"),
+      hide: () => window.$yourgptChatbot?.execute("widget:hide"),
+    }),
+    [state.isOpen]
+  );
 
   // Messaging functions
-  const messaging = useMemo(() => ({
-    sendMessage: (text: string, autoSend = true) => {
-      window.$yourgptChatbot?.execute('message:send', { text, send: autoSend });
-    },
-  }), []);
+  const messaging = useMemo(
+    () => ({
+      sendMessage: (text: string, autoSend = true) => {
+        window.$yourgptChatbot?.execute("message:send", { text, send: autoSend });
+      },
+    }),
+    []
+  );
 
   // Advanced features
-  const advanced = useMemo(() => ({
-    openBottomSheet: (url: string) => {
-      window.$yourgptChatbot?.execute('bottomSheet:open', { url });
-    },
-    startGame: (gameId: string, options = {}) => {
-      window.$yourgptChatbot?.execute('game:start', { id: gameId, ...options });
-    },
-  }), []);
+  const advanced = useMemo(
+    () => ({
+      openBottomSheet: (url: string) => {
+        window.$yourgptChatbot?.execute("bottomSheet:open", { url });
+      },
+      startGame: (gameId: string, options = {}) => {
+        window.$yourgptChatbot?.execute("game:start", { id: gameId, ...options });
+      },
+    }),
+    []
+  );
 
   // Data management
-  const dataManagement = useMemo(() => ({
-    setSessionData: (data: object) => {
-      window.$yourgptChatbot?.set('session:data', data);
-    },
-    setVisitorData: (data: object) => {
-      window.$yourgptChatbot?.set('visitor:data', data);
-    },
-    setContactData: (data: object) => {
-      window.$yourgptChatbot?.set('contact:data', data);
-    },
-  }), []);
+  const dataManagement = useMemo(
+    () => ({
+      setSessionData: (data: object) => {
+        window.$yourgptChatbot?.set("session:data", data);
+      },
+      setVisitorData: (data: object) => {
+        window.$yourgptChatbot?.set("visitor:data", data);
+      },
+      setContactData: (data: object) => {
+        window.$yourgptChatbot?.set("contact:data", data);
+      },
+    }),
+    []
+  );
 
   // Event listeners
-  const eventListeners = useMemo(() => ({
-    onInit: (callback: () => void) => {
-      window.$yourgptChatbot?.on('init', callback);
-      return () => window.$yourgptChatbot?.off('init', callback);
-    },
-    onMessageReceived: (callback: (data: any) => void) => {
-      window.$yourgptChatbot?.on('message:received', callback);
-      return () => window.$yourgptChatbot?.off('message:received', callback);
-    },
-    onEscalatedToHuman: (callback: (data: any) => void) => {
-      window.$yourgptChatbot?.on('escalatedToHuman', callback);
-      return () => window.$yourgptChatbot?.off('escalatedToHuman', callback);
-    },
-    onWidgetPopup: (callback: (isOpen: boolean) => void) => {
-      window.$yourgptChatbot?.on('widget:popup', callback);
-      return () => window.$yourgptChatbot?.off('widget:popup', callback);
-    },
-  }), []);
+  const eventListeners = useMemo(
+    () => ({
+      onInit: (callback: () => void) => {
+        window.$yourgptChatbot?.on("init", callback);
+        return () => window.$yourgptChatbot?.off("init", callback);
+      },
+      onMessageReceived: (callback: (data: any) => void) => {
+        window.$yourgptChatbot?.on("message:received", callback);
+        return () => window.$yourgptChatbot?.off("message:received", callback);
+      },
+      onEscalatedToHuman: (callback: (data: any) => void) => {
+        window.$yourgptChatbot?.on("escalatedToHuman", callback);
+        return () => window.$yourgptChatbot?.off("escalatedToHuman", callback);
+      },
+      onWidgetPopup: (callback: (isOpen: boolean) => void) => {
+        window.$yourgptChatbot?.on("widget:popup", callback);
+        return () => window.$yourgptChatbot?.off("widget:popup", callback);
+      },
+    }),
+    []
+  );
 
   // State synchronization
   useEffect(() => {
     // Listen for state changes
     const unsubscribePopup = eventListeners.onWidgetPopup((isOpen) => {
-      setState(prev => ({ ...prev, isOpen }));
+      setState((prev) => ({ ...prev, isOpen }));
     });
 
     const unsubscribeInit = eventListeners.onInit(() => {
-      setState(prev => ({ ...prev, isConnected: true, isLoaded: true }));
+      setState((prev) => ({ ...prev, isConnected: true, isLoaded: true }));
     });
 
     return () => {
@@ -774,6 +804,7 @@ export function useYourGPTChatbot() {
 **Purpose**: Manage AI action registration and handling.
 
 **Implementation**:
+
 ```typescript
 export function useAIActions() {
   const handlersRef = useRef<Map<string, AIActionHandler>>(new Map());
@@ -783,10 +814,10 @@ export function useAIActions() {
   const registerAction = useCallback((actionName: string, handler: AIActionHandler) => {
     // Store locally
     handlersRef.current.set(actionName, handler);
-    
+
     // Register with global SDK
     window.$yourgptChatbot?.on(`ai:action:${actionName}`, handler);
-    
+
     // Update state
     setRegisteredActions(Array.from(handlersRef.current.keys()));
   }, []);
@@ -795,10 +826,10 @@ export function useAIActions() {
   const unregisterAction = useCallback((actionName: string) => {
     // Remove locally
     handlersRef.current.delete(actionName);
-    
+
     // Unregister from global SDK
     window.$yourgptChatbot?.off(`ai:action:${actionName}`);
-    
+
     // Update state
     setRegisteredActions(Array.from(handlersRef.current.keys()));
   }, []);
@@ -809,11 +840,14 @@ export function useAIActions() {
   }, []);
 
   // Batch register multiple actions
-  const registerActions = useCallback((actions: Record<string, AIActionHandler>) => {
-    Object.entries(actions).forEach(([name, handler]) => {
-      registerAction(name, handler);
-    });
-  }, [registerAction]);
+  const registerActions = useCallback(
+    (actions: Record<string, AIActionHandler>) => {
+      Object.entries(actions).forEach(([name, handler]) => {
+        registerAction(name, handler);
+      });
+    },
+    [registerAction]
+  );
 
   // Cleanup on unmount
   useEffect(() => {
@@ -838,24 +872,24 @@ export function useAIActions() {
 
 ### Function Mapping: Current vs React SDK
 
-| Current Implementation | React SDK Equivalent | Description |
-|---|---|---|
-| `window.$yourgptChatbot.execute('widget:open')` | `chatbot.open()` | Opens widget popup |
-| `window.$yourgptChatbot.execute('widget:close')` | `chatbot.close()` | Closes widget popup |
-| `window.$yourgptChatbot.execute('widget:show')` | `chatbot.show()` | Shows widget button |
-| `window.$yourgptChatbot.execute('widget:hide')` | `chatbot.hide()` | Hides widget button |
-| `window.$yourgptChatbot.execute('message:send', {text, send})` | `chatbot.sendMessage(text, autoSend)` | Sends message |
-| `window.$yourgptChatbot.execute('bottomSheet:open', {url})` | `chatbot.openBottomSheet(url)` | Opens bottom sheet |
-| `window.$yourgptChatbot.execute('game:start', {id, ...options})` | `chatbot.startGame(gameId, options)` | Starts game |
-| `window.$yourgptChatbot.set('session:data', data)` | `chatbot.setSessionData(data)` | Sets session data |
-| `window.$yourgptChatbot.set('visitor:data', data)` | `chatbot.setVisitorData(data)` | Sets visitor data |
-| `window.$yourgptChatbot.set('contact:data', data)` | `chatbot.setContactData(data)` | Sets contact data |
-| `window.$yourgptChatbot.on('init', callback)` | `chatbot.onInit(callback)` | Listens for init |
-| `window.$yourgptChatbot.on('message:received', callback)` | `chatbot.onMessageReceived(callback)` | Listens for messages |
-| `window.$yourgptChatbot.on('escalatedToHuman', callback)` | `chatbot.onEscalatedToHuman(callback)` | Listens for escalation |
-| `window.$yourgptChatbot.on('widget:popup', callback)` | `chatbot.onWidgetPopup(callback)` | Listens for popup state |
-| `window.$yourgptChatbot.on('ai:action:actionName', handler)` | `aiActions.registerAction('actionName', handler)` | Registers AI action |
-| `window.$yourgptChatbot.off('ai:action:actionName')` | `aiActions.unregisterAction('actionName')` | Unregisters AI action |
+| Current Implementation                                           | React SDK Equivalent                              | Description             |
+| ---------------------------------------------------------------- | ------------------------------------------------- | ----------------------- |
+| `window.$yourgptChatbot.execute('widget:open')`                  | `chatbot.open()`                                  | Opens widget popup      |
+| `window.$yourgptChatbot.execute('widget:close')`                 | `chatbot.close()`                                 | Closes widget popup     |
+| `window.$yourgptChatbot.execute('widget:show')`                  | `chatbot.show()`                                  | Shows widget button     |
+| `window.$yourgptChatbot.execute('widget:hide')`                  | `chatbot.hide()`                                  | Hides widget button     |
+| `window.$yourgptChatbot.execute('message:send', {text, send})`   | `chatbot.sendMessage(text, autoSend)`             | Sends message           |
+| `window.$yourgptChatbot.execute('bottomSheet:open', {url})`      | `chatbot.openBottomSheet(url)`                    | Opens bottom sheet      |
+| `window.$yourgptChatbot.execute('game:start', {id, ...options})` | `chatbot.startGame(gameId, options)`              | Starts game             |
+| `window.$yourgptChatbot.set('session:data', data)`               | `chatbot.setSessionData(data)`                    | Sets session data       |
+| `window.$yourgptChatbot.set('visitor:data', data)`               | `chatbot.setVisitorData(data)`                    | Sets visitor data       |
+| `window.$yourgptChatbot.set('contact:data', data)`               | `chatbot.setContactData(data)`                    | Sets contact data       |
+| `window.$yourgptChatbot.on('init', callback)`                    | `chatbot.onInit(callback)`                        | Listens for init        |
+| `window.$yourgptChatbot.on('message:received', callback)`        | `chatbot.onMessageReceived(callback)`             | Listens for messages    |
+| `window.$yourgptChatbot.on('escalatedToHuman', callback)`        | `chatbot.onEscalatedToHuman(callback)`            | Listens for escalation  |
+| `window.$yourgptChatbot.on('widget:popup', callback)`            | `chatbot.onWidgetPopup(callback)`                 | Listens for popup state |
+| `window.$yourgptChatbot.on('ai:action:actionName', handler)`     | `aiActions.registerAction('actionName', handler)` | Registers AI action     |
+| `window.$yourgptChatbot.off('ai:action:actionName')`             | `aiActions.unregisterAction('actionName')`        | Unregisters AI action   |
 
 ### Complete API Reference
 
@@ -864,23 +898,22 @@ export function useAIActions() {
 Initialize the SDK with configuration options.
 
 **Parameters**:
+
 ```typescript
 interface YourGPTConfig {
-  widgetId: string;        // Required: Your widget ID
-  endpoint?: string;       // Optional: Custom endpoint
-  autoLoad?: boolean;      // Optional: Auto-load widget (default: true)
-  debug?: boolean;         // Optional: Enable debug mode (default: false)
-  whitelabel?: boolean;    // Optional: Use whitelabel endpoint
+  widgetId: string; // Required: Your widget ID
+  endpoint?: string; // Optional: Custom endpoint
+  autoLoad?: boolean; // Optional: Auto-load widget (default: true)
+  debug?: boolean; // Optional: Enable debug mode (default: false)
+  whitelabel?: boolean; // Optional: Use whitelabel endpoint
 }
 ```
 
 **Example**:
+
 ```typescript
 YourGPT.init({
-  widgetId: 'eb2a98b4-0809-4b5a-9134-bef1166af8fb',
-  endpoint: 'https://widget.yourgpt.ai',
-  autoLoad: true,
-  debug: process.env.NODE_ENV === 'development'
+  widgetId: "eb2a98b4-0809-4b5a-9134-bef1166af8fb",
 });
 ```
 
@@ -930,20 +963,24 @@ interface ChatbotAPI {
 **Widget Control Functions:**
 
 - **`open()`**: Opens the chatbot popup window
+
   - **Internal**: Calls `toggleChatbotPopup(true)` in SdkManager
   - **State Update**: Sets `isOpen` to `true`
   - **Side Effects**: May trigger `onWidgetPopup` callbacks
 
 - **`close()`**: Closes the chatbot popup window
+
   - **Internal**: Calls `toggleChatbotPopup(false)` in SdkManager
   - **State Update**: Sets `isOpen` to `false`
   - **Side Effects**: May trigger `onWidgetPopup` callbacks
 
 - **`toggle()`**: Toggles the chatbot popup state
+
   - **Logic**: Calls `close()` if open, `open()` if closed
   - **State-Aware**: Uses current `isOpen` state to determine action
 
 - **`show()`**: Shows the widget button/trigger
+
   - **Internal**: Calls `setChatbotVisible(true)` in SdkManager
   - **State Update**: Sets `isVisible` to `true`
   - **Use Case**: Re-enable widget after hiding
@@ -956,11 +993,11 @@ interface ChatbotAPI {
 **Messaging Functions:**
 
 - **`sendMessage(text, autoSend = true)`**: Sends a message to the chatbot
-  - **Parameters**: 
+  - **Parameters**:
     - `text`: Message content (required)
     - `autoSend`: Whether to automatically send the message (default: true)
   - **Internal**: Calls `setExecution()` with message data
-  - **Side Effects**: 
+  - **Side Effects**:
     - Opens widget popup automatically
     - Triggers message processing pipeline
     - May trigger `onMessageReceived` callbacks
@@ -968,13 +1005,14 @@ interface ChatbotAPI {
 **Advanced Features:**
 
 - **`openBottomSheet(url)`**: Opens a bottom sheet with external content
+
   - **Parameters**: `url` - URL to display in bottom sheet
   - **Internal**: Calls `bottomSheetContext.openBottomSheet()`
   - **Use Cases**: Documentation, forms, external tools
   - **Render Mode**: Uses "url" render mode
 
 - **`startGame(gameId, options)`**: Starts a gamified interaction
-  - **Parameters**: 
+  - **Parameters**:
     - `gameId`: Game identifier ("bouncyBird", "emojiRiddle", "guessMoji", "quizMania")
     - `options`: Configuration object
   - **Options**:
@@ -986,16 +1024,18 @@ interface ChatbotAPI {
 **Data Management Functions:**
 
 - **`setSessionData(data)`**: Sets session-specific data
+
   - **Parameters**: `data` - Object with session data
-  - **Behavior**: 
+  - **Behavior**:
     - If session exists: Immediate socket transmission
     - If no session: Queued until session creation
   - **Use Cases**: User state, preferences, temporary data
   - **Queue**: `sessionSetQueue` in SdkManager
 
 - **`setVisitorData(data)`**: Sets visitor-specific data
+
   - **Parameters**: `data` - Object with visitor data
-  - **Behavior**: 
+  - **Behavior**:
     - If visitor UID exists: Immediate socket transmission
     - If no visitor UID: Queued until visitor creation
   - **Use Cases**: Analytics, tracking, visitor behavior
@@ -1009,7 +1049,7 @@ interface ChatbotAPI {
     - `email`: User email address
     - `phone`: User phone number
     - `name`: User display name
-  - **Behavior**: 
+  - **Behavior**:
     - If visitor UID exists: Immediate socket transmission
     - If no visitor UID: Queued until visitor creation
   - **Queue**: `contactSetQueue` in SdkManager
@@ -1017,12 +1057,14 @@ interface ChatbotAPI {
 **Event Listener Functions:**
 
 - **`onInit(callback)`**: Listens for widget initialization
+
   - **Trigger**: When socket connects (`socketConnected = true`)
   - **Callback**: `() => void`
   - **Returns**: Cleanup function
   - **Use Cases**: Post-initialization setup, analytics
 
 - **`onMessageReceived(callback)`**: Listens for incoming messages
+
   - **Trigger**: When socket receives `SocketListenE.messageReceived`
   - **Callback**: `(data: any) => void`
   - **Data**: Message object with content, metadata
@@ -1030,6 +1072,7 @@ interface ChatbotAPI {
   - **Use Cases**: Notifications, message processing, analytics
 
 - **`onEscalatedToHuman(callback)`**: Listens for human escalation
+
   - **Trigger**: When chat mode changes to `ChatBotModeE.awaiting`
   - **Callback**: `(data: any) => void`
   - **Data**: Mode change data with `mode`, `modeKey` properties
@@ -1048,14 +1091,15 @@ The hook maintains synchronized state with the widget:
 
 ```typescript
 interface ChatbotState {
-  isOpen: boolean;        // Widget popup open/closed
-  isVisible: boolean;     // Widget button visible/hidden
-  isConnected: boolean;   // Socket connection status
-  isLoaded: boolean;      // Widget bundle loaded
+  isOpen: boolean; // Widget popup open/closed
+  isVisible: boolean; // Widget button visible/hidden
+  isConnected: boolean; // Socket connection status
+  isLoaded: boolean; // Widget bundle loaded
 }
 ```
 
 **State Updates:**
+
 - `isOpen`: Updates via `onWidgetPopup` listener
 - `isVisible`: Updates via widget visibility changes
 - `isConnected`: Updates via `onInit` listener
@@ -1082,18 +1126,20 @@ interface AIActionsAPI {
 **Action Registration:**
 
 - **`registerAction(actionName, handler)`**: Registers a single AI action
-  - **Parameters**: 
+
+  - **Parameters**:
     - `actionName`: Unique identifier for the action
     - `handler`: Function to handle the action
-  - **Internal**: 
+  - **Internal**:
     - Stores handler in local Map
     - Registers with global SDK using `ai:action:${actionName}` pattern
     - Updates `registeredActions` state
   - **Handler Signature**: `(data: ActionRecData, helpers: AIActionHelpers) => Promise<void> | void`
 
 - **`unregisterAction(actionName)`**: Unregisters an AI action
+
   - **Parameters**: `actionName` - Action to unregister
-  - **Internal**: 
+  - **Internal**:
     - Removes from local Map
     - Unregisters from global SDK
     - Updates `registeredActions` state
@@ -1107,6 +1153,7 @@ interface AIActionsAPI {
 **Action Management:**
 
 - **`getRegisteredActions()`**: Returns array of registered action names
+
   - **Returns**: `string[]` - List of action names
   - **Use Cases**: Debugging, validation, UI display
 
@@ -1123,10 +1170,10 @@ type AIActionHandler = (data: ActionRecData, helpers: AIActionHelpers) => Promis
 interface ActionRecData {
   action: Array<{
     function: {
-      arguments: string;    // JSON string of function arguments
-      name: string;        // Function name
+      arguments: string; // JSON string of function arguments
+      name: string; // Function name
     };
-    id: string;           // Action ID
+    id: string; // Action ID
   }>;
   session_data: {
     session_uid: number;
@@ -1145,6 +1192,7 @@ interface AIActionHelpers {
 **Helper Functions:**
 
 - **`helpers.respond(message)`**: Sends response back to AI
+
   - **Parameters**: `message` - Response text
   - **Internal**: Calls `socketManager.sendAIActionToolResponse()`
   - **Required**: Widget UID must be set
@@ -1170,6 +1218,7 @@ The hook integrates with the existing AI Actions infrastructure:
 - **Processing**: Handled by `aiActionsSdk.handleAction()`
 
 **Flow**:
+
 1. AI triggers action on server
 2. Server sends action via socket
 3. SdkManager receives socket event
@@ -1184,30 +1233,27 @@ The hook integrates with the existing AI Actions infrastructure:
 
 ```typescript
 // main.tsx - App Entry Point
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { YourGPT } from '@yourgpt/react-sdk';
-import App from './App';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { YourGPT } from "@yourgpt/react-sdk";
+import App from "./App";
 
 // Initialize SDK
 YourGPT.init({
-  widgetId: 'your-widget-id',
-  endpoint: 'https://widget.yourgpt.ai',
-  autoLoad: true,
-  debug: process.env.NODE_ENV === 'development'
+  widgetId: "your-widget-id",
 });
 
-const root = ReactDOM.createRoot(document.getElementById('root')!);
+const root = ReactDOM.createRoot(document.getElementById("root")!);
 root.render(<App />);
 ```
 
 ```typescript
 // App.tsx - Main Application
-import React, { useEffect } from 'react';
-import { useYourGPTChatbot, useAIActions } from '@yourgpt/react-sdk';
-import ChatControls from './components/ChatControls';
-import UserProfile from './components/UserProfile';
-import AIActionsDemo from './components/AIActionsDemo';
+import React, { useEffect } from "react";
+import { useYourGPTChatbot, useAIActions } from "@yourgpt/react-sdk";
+import ChatControls from "./components/ChatControls";
+import UserProfile from "./components/UserProfile";
+import AIActionsDemo from "./components/AIActionsDemo";
 
 function App() {
   const chatbot = useYourGPTChatbot();
@@ -1218,34 +1264,34 @@ function App() {
     const cleanup = [
       // Listen for initialization
       chatbot.onInit(() => {
-        console.log('✅ Chatbot initialized');
+        console.log("✅ Chatbot initialized");
         // Set initial user data
         chatbot.setContactData({
-          email: 'user@example.com',
-          name: 'Demo User'
+          email: "user@example.com",
+          name: "Demo User",
         });
       }),
 
       // Listen for messages
       chatbot.onMessageReceived((data) => {
-        console.log('📨 Message received:', data);
+        console.log("📨 Message received:", data);
         // Handle notifications, analytics, etc.
       }),
 
       // Listen for human escalation
       chatbot.onEscalatedToHuman((data) => {
-        console.log('🆘 Escalated to human:', data);
+        console.log("🆘 Escalated to human:", data);
         // Show notification to user
       }),
 
       // Listen for widget state changes
       chatbot.onWidgetPopup((isOpen) => {
-        console.log('💬 Widget is', isOpen ? 'open' : 'closed');
+        console.log("💬 Widget is", isOpen ? "open" : "closed");
         // Update parent component state
-      })
+      }),
     ];
 
-    return () => cleanup.forEach(fn => fn());
+    return () => cleanup.forEach((fn) => fn());
   }, [chatbot]);
 
   return (
@@ -1254,7 +1300,7 @@ function App() {
         <h1>YourGPT React SDK Demo</h1>
         <ChatControls />
       </header>
-      
+
       <main>
         <UserProfile />
         <AIActionsDemo />
@@ -1268,29 +1314,29 @@ export default App;
 
 ```typescript
 // components/ChatControls.tsx - Widget Controls
-import React from 'react';
-import { useYourGPTChatbot } from '@yourgpt/react-sdk';
+import React from "react";
+import { useYourGPTChatbot } from "@yourgpt/react-sdk";
 
 export default function ChatControls() {
   const chatbot = useYourGPTChatbot();
 
   const handleQuickMessage = () => {
-    chatbot.sendMessage('Hello! I need help with my account.');
+    chatbot.sendMessage("Hello! I need help with my account.");
   };
 
   const handleStartQuiz = () => {
-    chatbot.startGame('quizMania', {
+    chatbot.startGame("quizMania", {
       showExitConfirmation: true,
       leadCapture: true,
       gameConfig: {
-        difficulty: 'medium',
-        category: 'product-knowledge'
-      }
+        difficulty: "medium",
+        category: "product-knowledge",
+      },
     });
   };
 
   const handleOpenDocs = () => {
-    chatbot.openBottomSheet('https://docs.example.com/api');
+    chatbot.openBottomSheet("https://docs.example.com/api");
   };
 
   return (
@@ -1298,15 +1344,15 @@ export default function ChatControls() {
       <button onClick={chatbot.open}>Open Chat</button>
       <button onClick={chatbot.close}>Close Chat</button>
       <button onClick={chatbot.toggle}>Toggle Chat</button>
-      
+
       <button onClick={handleQuickMessage}>Quick Help</button>
       <button onClick={handleStartQuiz}>Start Quiz</button>
       <button onClick={handleOpenDocs}>View Docs</button>
-      
+
       <div className="widget-status">
-        <span>Status: {chatbot.isConnected ? '🟢 Connected' : '🔴 Disconnected'}</span>
-        <span>State: {chatbot.isOpen ? '📖 Open' : '📝 Closed'}</span>
-        <span>Visible: {chatbot.isVisible ? '👁️ Visible' : '🙈 Hidden'}</span>
+        <span>Status: {chatbot.isConnected ? "🟢 Connected" : "🔴 Disconnected"}</span>
+        <span>State: {chatbot.isOpen ? "📖 Open" : "📝 Closed"}</span>
+        <span>Visible: {chatbot.isVisible ? "👁️ Visible" : "🙈 Hidden"}</span>
       </div>
     </div>
   );
@@ -1315,24 +1361,24 @@ export default function ChatControls() {
 
 ```typescript
 // components/AIActionsDemo.tsx - AI Actions Integration
-import React, { useEffect } from 'react';
-import { useAIActions } from '@yourgpt/react-sdk';
+import React, { useEffect } from "react";
+import { useAIActions } from "@yourgpt/react-sdk";
 
 export default function AIActionsDemo() {
   const aiActions = useAIActions();
 
   useEffect(() => {
     // Register location action
-    aiActions.registerAction('get_location', async (data, helpers) => {
+    aiActions.registerAction("get_location", async (data, helpers) => {
       const confirmed = await helpers.confirm({
-        title: 'Location Access',
-        description: 'This app wants to access your location. Allow?',
-        acceptLabel: 'Allow',
-        rejectLabel: 'Deny'
+        title: "Location Access",
+        description: "This app wants to access your location. Allow?",
+        acceptLabel: "Allow",
+        rejectLabel: "Deny",
       });
 
       if (!confirmed) {
-        helpers.respond('Location access denied by user');
+        helpers.respond("Location access denied by user");
         return;
       }
 
@@ -1349,16 +1395,16 @@ export default function AIActionsDemo() {
     });
 
     // Register screenshot action
-    aiActions.registerAction('take_screenshot', async (data, helpers) => {
+    aiActions.registerAction("take_screenshot", async (data, helpers) => {
       const confirmed = await helpers.confirm({
-        title: 'Screenshot',
-        description: 'Take a screenshot of the current page?',
-        acceptLabel: 'Take Screenshot',
-        rejectLabel: 'Cancel'
+        title: "Screenshot",
+        description: "Take a screenshot of the current page?",
+        acceptLabel: "Take Screenshot",
+        rejectLabel: "Cancel",
       });
 
       if (!confirmed) {
-        helpers.respond('Screenshot cancelled');
+        helpers.respond("Screenshot cancelled");
         return;
       }
 
@@ -1366,14 +1412,14 @@ export default function AIActionsDemo() {
         // Use html2canvas or similar library
         const canvas = await html2canvas(document.body);
         const dataUrl = canvas.toDataURL();
-        helpers.respond('Screenshot taken successfully');
+        helpers.respond("Screenshot taken successfully");
       } catch (error) {
         helpers.respond(`Failed to take screenshot: ${error.message}`);
       }
     });
 
     // Register system info action
-    aiActions.registerAction('get_system_info', async (data, helpers) => {
+    aiActions.registerAction("get_system_info", async (data, helpers) => {
       const systemInfo = {
         userAgent: navigator.userAgent,
         language: navigator.language,
@@ -1381,7 +1427,7 @@ export default function AIActionsDemo() {
         screenSize: `${screen.width}x${screen.height}`,
         windowSize: `${window.innerWidth}x${window.innerHeight}`,
         url: window.location.href,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       helpers.respond(`System Information:\n${JSON.stringify(systemInfo, null, 2)}`);
@@ -1389,30 +1435,30 @@ export default function AIActionsDemo() {
 
     // Register batch actions
     aiActions.registerActions({
-      'get_page_title': async (data, helpers) => {
+      get_page_title: async (data, helpers) => {
         helpers.respond(`Page title: ${document.title}`);
       },
-      
-      'scroll_to_top': async (data, helpers) => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        helpers.respond('Scrolled to top of page');
+
+      scroll_to_top: async (data, helpers) => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        helpers.respond("Scrolled to top of page");
       },
-      
-      'get_form_data': async (data, helpers) => {
-        const forms = document.querySelectorAll('form');
-        const formData = Array.from(forms).map(form => {
+
+      get_form_data: async (data, helpers) => {
+        const forms = document.querySelectorAll("form");
+        const formData = Array.from(forms).map((form) => {
           const data = new FormData(form);
           return Object.fromEntries(data.entries());
         });
         helpers.respond(`Found ${forms.length} forms: ${JSON.stringify(formData)}`);
-      }
+      },
     });
 
     // Cleanup on unmount
     return () => {
-      aiActions.unregisterAction('get_location');
-      aiActions.unregisterAction('take_screenshot');
-      aiActions.unregisterAction('get_system_info');
+      aiActions.unregisterAction("get_location");
+      aiActions.unregisterAction("take_screenshot");
+      aiActions.unregisterAction("get_system_info");
     };
   }, [aiActions]);
 
@@ -1421,7 +1467,7 @@ export default function AIActionsDemo() {
       <h2>AI Actions Demo</h2>
       <p>Registered Actions: {aiActions.registeredActions.length}</p>
       <ul>
-        {aiActions.registeredActions.map(action => (
+        {aiActions.registeredActions.map((action) => (
           <li key={action}>{action}</li>
         ))}
       </ul>
@@ -1434,16 +1480,16 @@ export default function AIActionsDemo() {
 
 ```typescript
 // components/UserProfile.tsx - User Data Management
-import React, { useState, useEffect } from 'react';
-import { useYourGPTChatbot } from '@yourgpt/react-sdk';
+import React, { useState, useEffect } from "react";
+import { useYourGPTChatbot } from "@yourgpt/react-sdk";
 
 interface UserData {
   id: string;
   email: string;
   name: string;
-  plan: 'free' | 'pro' | 'enterprise';
+  plan: "free" | "pro" | "enterprise";
   preferences: {
-    theme: 'light' | 'dark';
+    theme: "light" | "dark";
     notifications: boolean;
     language: string;
   };
@@ -1456,15 +1502,15 @@ export default function UserProfile() {
   // Simulate user login
   useEffect(() => {
     const mockUser: UserData = {
-      id: '12345',
-      email: 'user@example.com',
-      name: 'John Doe',
-      plan: 'pro',
+      id: "12345",
+      email: "user@example.com",
+      name: "John Doe",
+      plan: "pro",
       preferences: {
-        theme: 'dark',
+        theme: "dark",
         notifications: true,
-        language: 'en'
-      }
+        language: "en",
+      },
     };
 
     setUserData(mockUser);
@@ -1477,7 +1523,7 @@ export default function UserProfile() {
       chatbot.setContactData({
         email: userData.email,
         name: userData.name,
-        user_hash: `user_${userData.id}` // Secure hash for user identity
+        user_hash: `user_${userData.id}`, // Secure hash for user identity
       });
 
       // Set session data (temporary data for this session)
@@ -1485,26 +1531,26 @@ export default function UserProfile() {
         userId: userData.id,
         plan: userData.plan,
         sessionStart: new Date().toISOString(),
-        features: userData.plan === 'enterprise' ? ['ai-actions', 'games', 'priority-support'] : ['basic-chat'],
-        preferences: userData.preferences
+        features: userData.plan === "enterprise" ? ["ai-actions", "games", "priority-support"] : ["basic-chat"],
+        preferences: userData.preferences,
       });
 
       // Set visitor data (analytics/tracking data)
       chatbot.setVisitorData({
-        source: 'web-app',
+        source: "web-app",
         userAgent: navigator.userAgent,
         referrer: document.referrer,
         viewport: `${window.innerWidth}x${window.innerHeight}`,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
   }, [userData, chatbot]);
 
-  const updatePreferences = (newPreferences: Partial<UserData['preferences']>) => {
+  const updatePreferences = (newPreferences: Partial<UserData["preferences"]>) => {
     if (userData) {
       const updatedUser = {
         ...userData,
-        preferences: { ...userData.preferences, ...newPreferences }
+        preferences: { ...userData.preferences, ...newPreferences },
       };
       setUserData(updatedUser);
     }
@@ -1518,28 +1564,27 @@ export default function UserProfile() {
     <div className="user-profile">
       <h2>User Profile</h2>
       <div className="profile-info">
-        <p><strong>Name:</strong> {userData.name}</p>
-        <p><strong>Email:</strong> {userData.email}</p>
-        <p><strong>Plan:</strong> {userData.plan}</p>
+        <p>
+          <strong>Name:</strong> {userData.name}
+        </p>
+        <p>
+          <strong>Email:</strong> {userData.email}
+        </p>
+        <p>
+          <strong>Plan:</strong> {userData.plan}
+        </p>
       </div>
-      
+
       <div className="preferences">
         <h3>Preferences</h3>
         <label>
-          <input
-            type="checkbox"
-            checked={userData.preferences.notifications}
-            onChange={(e) => updatePreferences({ notifications: e.target.checked })}
-          />
+          <input type="checkbox" checked={userData.preferences.notifications} onChange={(e) => updatePreferences({ notifications: e.target.checked })} />
           Enable Notifications
         </label>
-        
+
         <label>
           Theme:
-          <select
-            value={userData.preferences.theme}
-            onChange={(e) => updatePreferences({ theme: e.target.value as 'light' | 'dark' })}
-          >
+          <select value={userData.preferences.theme} onChange={(e) => updatePreferences({ theme: e.target.value as "light" | "dark" })}>
             <option value="light">Light</option>
             <option value="dark">Dark</option>
           </select>
@@ -1568,10 +1613,10 @@ useEffect(() => {
         await socketManager.setSessionData({
           widget_uid: widgetUid,
           session_uid: activeSession.session_uid,
-          ...data
+          ...data,
         });
       } catch (error) {
-        console.error('Failed to set session data:', error);
+        console.error("Failed to set session data:", error);
         // Optionally re-queue the data
         sessionSetQueue.unshift(data);
         break; // Stop processing to prevent cascade failures
@@ -1593,7 +1638,7 @@ interface MessageData {
   id: string;
   content: string;
   timestamp: string;
-  sender: 'user' | 'bot' | 'agent';
+  sender: "user" | "bot" | "agent";
   metadata?: Record<string, any>;
 }
 
@@ -1627,19 +1672,19 @@ interface ChatbotEventHandlers {
 // Memoized event handlers
 const useYourGPTChatbot = () => {
   const eventHandlersRef = useRef<Map<string, Function[]>>(new Map());
-  
+
   const addEventListener = useCallback((event: string, handler: Function) => {
     const handlers = eventHandlersRef.current.get(event) || [];
     handlers.push(handler);
     eventHandlersRef.current.set(event, handlers);
-    
+
     // Register with global SDK once
     if (handlers.length === 1) {
       window.$yourgptChatbot?.on(event, (data: any) => {
-        handlers.forEach(h => h(data));
+        handlers.forEach((h) => h(data));
       });
     }
-    
+
     return () => {
       const currentHandlers = eventHandlersRef.current.get(event) || [];
       const index = currentHandlers.indexOf(handler);
@@ -1649,7 +1694,7 @@ const useYourGPTChatbot = () => {
       }
     };
   }, []);
-  
+
   // ... rest of hook
 };
 ```
@@ -1670,19 +1715,19 @@ const useYourGPTChatbot = () => {
     isLoaded: false,
     lastMessageId: null,
     messageCount: 0,
-    connectionRetries: 0
+    connectionRetries: 0,
   });
 
   // Sync with widget state
   useEffect(() => {
     const checkWidgetState = () => {
-      const widgetEl = document.getElementById('yourgpt_root');
+      const widgetEl = document.getElementById("yourgpt_root");
       const isLoaded = !!widgetEl;
-      
-      setState(prev => ({
+
+      setState((prev) => ({
         ...prev,
         isLoaded,
-        isVisible: isLoaded && widgetEl.style.display !== 'none'
+        isVisible: isLoaded && widgetEl.style.display !== "none",
       }));
     };
 
@@ -1704,20 +1749,20 @@ const useYourGPTChatbot = () => {
 // Priority queue implementation
 class PriorityQueue<T> {
   private items: Array<{ data: T; priority: number }> = [];
-  
+
   enqueue(data: T, priority: number = 0) {
     this.items.push({ data, priority });
     this.items.sort((a, b) => b.priority - a.priority);
   }
-  
+
   dequeue(): T | undefined {
     return this.items.shift()?.data;
   }
-  
+
   size(): number {
     return this.items.length;
   }
-  
+
   clear() {
     this.items = [];
   }
@@ -1737,37 +1782,33 @@ const contactSetQueue = new PriorityQueue<ContactData>();
 
 ```typescript
 // Retry mechanism for failed operations
-const withRetry = async <T>(
-  operation: () => Promise<T>,
-  maxRetries: number = 3,
-  delay: number = 1000
-): Promise<T> => {
+const withRetry = async <T>(operation: () => Promise<T>, maxRetries: number = 3, delay: number = 1000): Promise<T> => {
   let lastError: Error;
-  
+
   for (let i = 0; i <= maxRetries; i++) {
     try {
       return await operation();
     } catch (error) {
       lastError = error as Error;
-      
+
       if (i === maxRetries) {
         throw lastError;
       }
-      
-      await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+
+      await new Promise((resolve) => setTimeout(resolve, delay * Math.pow(2, i)));
     }
   }
-  
+
   throw lastError;
 };
 
 // Usage
 const setSessionData = async (data: SessionData) => {
-  return withRetry(() => 
+  return withRetry(() =>
     socketManager.setSessionData({
       widget_uid: widgetUid,
       session_uid: activeSession.session_uid,
-      data
+      data,
     })
   );
 };
@@ -1790,28 +1831,28 @@ interface AnalyticsEvent {
 const useAnalytics = () => {
   const track = useCallback((event: AnalyticsEvent) => {
     // Send to analytics service
-    window.gtag?.('event', event.name, event.properties);
-    
+    window.gtag?.("event", event.name, event.properties);
+
     // Also send to YourGPT analytics
-    window.$yourgptChatbot?.execute('analytics:track', event);
+    window.$yourgptChatbot?.execute("analytics:track", event);
   }, []);
-  
+
   return { track };
 };
 
 // Usage in hooks
 const useYourGPTChatbot = () => {
   const { track } = useAnalytics();
-  
+
   const open = useCallback(() => {
-    window.$yourgptChatbot?.execute('widget:open');
+    window.$yourgptChatbot?.execute("widget:open");
     track({
-      name: 'widget_opened',
-      properties: { source: 'react_sdk' },
-      timestamp: new Date().toISOString()
+      name: "widget_opened",
+      properties: { source: "react_sdk" },
+      timestamp: new Date().toISOString(),
     });
   }, [track]);
-  
+
   // ... rest of hook
 };
 ```
@@ -1825,34 +1866,37 @@ const useYourGPTChatbot = () => {
 ```typescript
 // Enhanced debugging
 const useYourGPTChatbot = () => {
-  const debugMode = process.env.NODE_ENV === 'development';
-  
-  const debug = useCallback((message: string, data?: any) => {
-    if (debugMode) {
-      console.log(`[YourGPT SDK] ${message}`, data);
-    }
-  }, [debugMode]);
-  
+  const debugMode = process.env.NODE_ENV === "development";
+
+  const debug = useCallback(
+    (message: string, data?: any) => {
+      if (debugMode) {
+        console.log(`[YourGPT SDK] ${message}`, data);
+      }
+    },
+    [debugMode]
+  );
+
   const open = useCallback(() => {
-    debug('Opening widget');
-    window.$yourgptChatbot?.execute('widget:open');
+    debug("Opening widget");
+    window.$yourgptChatbot?.execute("widget:open");
   }, [debug]);
-  
+
   // ... rest of hook
 };
 
 // React DevTools integration
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === "development") {
   window.__YOURGPT_SDK_DEBUG__ = {
     getState: () => ({
       queues: {
         session: sessionSetQueue.length,
         visitor: visitorSetQueue.length,
-        contact: contactSetQueue.length
+        contact: contactSetQueue.length,
       },
       listeners: Object.keys(listeners).length,
-      aiActions: aiActionsSdk.getRegisteredActionNames()
-    })
+      aiActions: aiActionsSdk.getRegisteredActionNames(),
+    }),
   };
 }
 ```
@@ -1867,24 +1911,24 @@ if (process.env.NODE_ENV === 'development') {
 // SSR-safe initialization
 const useYourGPTChatbot = () => {
   const [isClient, setIsClient] = useState(false);
-  
+
   useEffect(() => {
     setIsClient(true);
   }, []);
-  
+
   const open = useCallback(() => {
-    if (isClient && typeof window !== 'undefined') {
-      window.$yourgptChatbot?.execute('widget:open');
+    if (isClient && typeof window !== "undefined") {
+      window.$yourgptChatbot?.execute("widget:open");
     }
   }, [isClient]);
-  
+
   // ... rest of hook
 };
 
 // Lazy loading for SSR
-const YourGPTChatbot = lazy(() => 
-  import('./YourGPTChatbot').then(module => ({
-    default: module.YourGPTChatbot
+const YourGPTChatbot = lazy(() =>
+  import("./YourGPTChatbot").then((module) => ({
+    default: module.YourGPTChatbot,
   }))
 );
 ```
@@ -1916,18 +1960,14 @@ export const createMockYourGPTChatbot = () => ({
   onInit: jest.fn(() => jest.fn()),
   onMessageReceived: jest.fn(() => jest.fn()),
   onEscalatedToHuman: jest.fn(() => jest.fn()),
-  onWidgetPopup: jest.fn(() => jest.fn())
+  onWidgetPopup: jest.fn(() => jest.fn()),
 });
 
 // Test utilities
 export const YourGPTTestProvider = ({ children }: { children: React.ReactNode }) => {
   const mockChatbot = createMockYourGPTChatbot();
-  
-  return (
-    <YourGPTContext.Provider value={mockChatbot}>
-      {children}
-    </YourGPTContext.Provider>
-  );
+
+  return <YourGPTContext.Provider value={mockChatbot}>{children}</YourGPTContext.Provider>;
 };
 ```
 
@@ -1942,23 +1982,23 @@ function MyComponent() {
   useEffect(() => {
     // Listen for messages
     chatbot.onMessageReceived((data) => {
-      console.log('Message received:', data);
+      console.log("Message received:", data);
     });
 
     // Listen for human escalation
     chatbot.onEscalatedToHuman((data) => {
-      console.log('Escalated to human:', data);
+      console.log("Escalated to human:", data);
     });
   }, [chatbot]);
 
   const handleSendMessage = () => {
-    chatbot.sendMessage('Hello from React!');
+    chatbot.sendMessage("Hello from React!");
   };
 
   const handleSetUserData = () => {
     chatbot.setContactData({
-      email: 'user@example.com',
-      name: 'John Doe'
+      email: "user@example.com",
+      name: "John Doe",
     });
   };
 
@@ -2029,16 +2069,16 @@ function LocationComponent() {
 
   useEffect(() => {
     // Register location action
-    aiActions.registerAction('get_location', async (data, helpers) => {
+    aiActions.registerAction("get_location", async (data, helpers) => {
       const confirmed = await helpers.confirm({
-        title: 'Location Access',
-        description: 'The chatbot wants to access your location. Allow?',
-        acceptLabel: 'Allow',
-        rejectLabel: 'Deny'
+        title: "Location Access",
+        description: "The chatbot wants to access your location. Allow?",
+        acceptLabel: "Allow",
+        rejectLabel: "Deny",
       });
 
       if (!confirmed) {
-        helpers.respond('User denied location access');
+        helpers.respond("User denied location access");
         return;
       }
 
@@ -2046,31 +2086,31 @@ function LocationComponent() {
         const position = await getCurrentPosition();
         helpers.respond(`Location: ${position.coords.latitude}, ${position.coords.longitude}`);
       } catch (error) {
-        helpers.respond('Failed to get location: ' + error.message);
+        helpers.respond("Failed to get location: " + error.message);
       }
     });
 
     // Register screenshot action
-    aiActions.registerAction('take_screenshot', async (data, helpers) => {
+    aiActions.registerAction("take_screenshot", async (data, helpers) => {
       const confirmed = await helpers.confirm({
-        title: 'Screenshot',
-        description: 'Take a screenshot of the current page?',
-        acceptLabel: 'Allow',
-        rejectLabel: 'Cancel'
+        title: "Screenshot",
+        description: "Take a screenshot of the current page?",
+        acceptLabel: "Allow",
+        rejectLabel: "Cancel",
       });
 
       if (confirmed) {
         // Screenshot logic here
-        helpers.respond('Screenshot taken successfully');
+        helpers.respond("Screenshot taken successfully");
       } else {
-        helpers.respond('Screenshot cancelled');
+        helpers.respond("Screenshot cancelled");
       }
     });
 
     // Cleanup on unmount
     return () => {
-      aiActions.unregisterAction('get_location');
-      aiActions.unregisterAction('take_screenshot');
+      aiActions.unregisterAction("get_location");
+      aiActions.unregisterAction("take_screenshot");
     };
   }, [aiActions]);
 
@@ -2087,19 +2127,17 @@ function GameComponent() {
   const chatbot = useYourGPTChatbot();
 
   const startQuiz = () => {
-    chatbot.startGame('quizMania', {
+    chatbot.startGame("quizMania", {
       showExitConfirmation: true,
       leadCapture: true,
       gameConfig: {
-        difficulty: 'medium',
-        category: 'science'
-      }
+        difficulty: "medium",
+        category: "science",
+      },
     });
   };
 
-  return (
-    <button onClick={startQuiz}>Start Quiz Game</button>
-  );
+  return <button onClick={startQuiz}>Start Quiz Game</button>;
 }
 ```
 
@@ -2110,12 +2148,10 @@ function DocumentViewer() {
   const chatbot = useYourGPTChatbot();
 
   const openDocument = () => {
-    chatbot.openBottomSheet('https://docs.example.com/help');
+    chatbot.openBottomSheet("https://docs.example.com/help");
   };
 
-  return (
-    <button onClick={openDocument}>Open Help Document</button>
-  );
+  return <button onClick={openDocument}>Open Help Document</button>;
 }
 ```
 
@@ -2128,16 +2164,16 @@ function UserSession() {
   useEffect(() => {
     // Set session data when user logs in
     chatbot.setSessionData({
-      userId: '12345',
-      plan: 'premium',
-      features: ['ai-actions', 'games']
+      userId: "12345",
+      plan: "premium",
+      features: ["ai-actions", "games"],
     });
 
     // Set visitor data
     chatbot.setVisitorData({
-      source: 'website',
-      utm_campaign: 'spring2024',
-      page_views: 5
+      source: "website",
+      utm_campaign: "spring2024",
+      page_views: 5,
     });
   }, [chatbot]);
 
@@ -2156,24 +2192,24 @@ function EventListener() {
   useEffect(() => {
     // Widget initialization
     chatbot.onInit(() => {
-      console.log('Widget initialized');
+      console.log("Widget initialized");
     });
 
     // Message received
     chatbot.onMessageReceived((data) => {
-      console.log('Message:', data);
+      console.log("Message:", data);
       // Track analytics, show notifications, etc.
     });
 
     // Human escalation
     chatbot.onEscalatedToHuman((data) => {
-      console.log('Escalated to human:', data);
+      console.log("Escalated to human:", data);
       // Notify support team, update UI, etc.
     });
 
     // Widget popup state
     chatbot.onWidgetPopup((isOpen) => {
-      console.log('Widget is', isOpen ? 'open' : 'closed');
+      console.log("Widget is", isOpen ? "open" : "closed");
       // Update parent component state, analytics, etc.
     });
   }, [chatbot]);
@@ -2187,13 +2223,7 @@ function EventListener() {
 The SDK is built with TypeScript and provides full type safety:
 
 ```typescript
-import type {
-  YourGPTConfig,
-  AIActionData,
-  AIActionHelpers,
-  AIActionHandler,
-  ConfirmOptions,
-} from '@yourgpt/react-sdk';
+import type { YourGPTConfig, AIActionData, AIActionHelpers, AIActionHandler, ConfirmOptions } from "@yourgpt/react-sdk";
 
 // All types are exported for custom implementations
 ```
@@ -2204,12 +2234,12 @@ import type {
 
 ```typescript
 // ✅ Good - Initialize in main.tsx
-YourGPT.init({ widgetId: 'your-id' });
+YourGPT.init({ widgetId: "your-id" });
 
 // ❌ Bad - Initialize in components
 function MyComponent() {
   useEffect(() => {
-    YourGPT.init({ widgetId: 'your-id' });
+    YourGPT.init({ widgetId: "your-id" });
   }, []);
 }
 ```
@@ -2233,28 +2263,28 @@ useEffect(() => {
 
 ```typescript
 // ✅ Good - Handle errors and confirmations
-aiActions.registerAction('risky_action', async (data, helpers) => {
+aiActions.registerAction("risky_action", async (data, helpers) => {
   try {
     const confirmed = await helpers.confirm({
-      title: 'Confirm Action',
-      description: 'This action will modify data. Continue?'
+      title: "Confirm Action",
+      description: "This action will modify data. Continue?",
     });
 
     if (confirmed) {
       // Perform action
-      helpers.respond('Action completed');
+      helpers.respond("Action completed");
     } else {
-      helpers.respond('Action cancelled');
+      helpers.respond("Action cancelled");
     }
   } catch (error) {
-    helpers.respond('Error: ' + error.message);
+    helpers.respond("Error: " + error.message);
   }
 });
 
 // ❌ Bad - No error handling or confirmation
-aiActions.registerAction('risky_action', async (data, helpers) => {
+aiActions.registerAction("risky_action", async (data, helpers) => {
   // Risky operation without confirmation
-  helpers.respond('Done');
+  helpers.respond("Done");
 });
 ```
 
@@ -2263,11 +2293,13 @@ aiActions.registerAction('risky_action', async (data, helpers) => {
 ### Common Issues
 
 1. **Widget not loading**
+
    - Verify `widgetId` is correct
    - Check network connectivity
    - Ensure endpoint is reachable
 
 2. **AI actions not working**
+
    - Check action name matches server expectation
    - Verify handlers are registered before AI needs them
    - Check console for error messages
@@ -2281,8 +2313,8 @@ aiActions.registerAction('risky_action', async (data, helpers) => {
 
 ```typescript
 YourGPT.init({
-  widgetId: 'your-id',
-  debug: true // Enable debug logging
+  widgetId: "your-id",
+  debug: true, // Enable debug logging
 });
 ```
 
@@ -2292,9 +2324,9 @@ YourGPT.init({
 
 ```javascript
 // Old way
-window.$yourgptChatbot.execute('widget:open');
-window.$yourgptChatbot.on('message:received', handleMessage);
-window.$yourgptChatbot.on('ai:action:get_location', handleLocation);
+window.$yourgptChatbot.execute("widget:open");
+window.$yourgptChatbot.on("message:received", handleMessage);
+window.$yourgptChatbot.on("ai:action:get_location", handleLocation);
 ```
 
 ### After (React SDK)
@@ -2311,12 +2343,13 @@ chatbot.open();
 chatbot.onMessageReceived(handleMessage);
 
 // AI actions
-aiActions.registerAction('get_location', handleLocation);
+aiActions.registerAction("get_location", handleLocation);
 ```
 
 ## Support
 
 For issues and questions:
+
 - GitHub Issues: [yourgpt/react-sdk](https://github.com/yourgpt/react-sdk/issues)
 - Documentation: [docs.yourgpt.ai](https://docs.yourgpt.ai)
 - Support: support@yourgpt.ai
