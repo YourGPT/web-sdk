@@ -1,5 +1,6 @@
 # Copilot Todo List
 
+
 ## Prerequisites
 
 ### YourGPT Widget Integration
@@ -17,8 +18,8 @@ import { YourGPT, useAIActions } from "@yourgpt/widget-web-sdk/react";
 
 // Initialize SDK
 YourGPT.init({
-  widgetId: "your-widget-id",
-  endpoint: "https://widget.yourgpt.ai",
+  widgetId: "271f1c55-4a82-4c7f-9634-762078763943",
+  endpoint: "https://dev-widget.yourgpt.ai",
   debug: true,
 });
 ```
@@ -27,6 +28,9 @@ YourGPT.init({
 
 
 ### Bulk Delete (`bulk_delete`)
+
+![Bulk Delete](https://github.com/user-attachments/assets/4df1ad5d-933c-439a-9ac2-3dd9a52d5925)
+
 - Deletes multiple todos based on specified criteria
 - Supports filtering by status, category, priority, and tags
 - Defaults to deleting only completed tasks if no filters provided
@@ -50,6 +54,8 @@ if (!status && !category && !priority && !tag) {
 ```
 
 ### Move Todos (`move_todos`)
+![Move Todos](https://github.com/user-attachments/assets/3e4c46a4-5f43-4b00-bdcc-c518b2f5d93c)
+
 - Moves tasks between different status boards
 - Supports bulk movement based on filters
 - Updates task timestamps automatically
@@ -85,6 +91,8 @@ setTodos((prevTodos) => {
 ```
 
 ### Create Bulk Tasks (`create_bulk_tasks`)
+![Create Bulk Tasks](https://github.com/user-attachments/assets/6d648857-d974-4a8b-98ea-f093c288c7df)
+
 - Creates multiple tasks at once
 - Supports two modes:
   1. Range-based creation (from-to numbers)
@@ -133,6 +141,8 @@ if (csv) {
 ```
 
 ### Beast Mode (`beast_mode`)
+![Beast Mode](https://github.com/user-attachments/assets/68124d85-305a-4c50-ba45-da1168d38ed2)
+
 - Activates special "forest" theme
 - Provides visual feedback with emojis
 - No additional parameters required
@@ -191,12 +201,15 @@ Here are some recommended next steps to enhance your Copilot Todo List applicati
 
 ### Integration with YourGPT Dashboard
 
-- Create custom AI actions in YourGPT dashboard 
+- Create custom AI actions in YourGPT dashboard
+  
+https://github.com/user-attachments/assets/10f6ddde-f721-4f53-a54f-727e91e53d46
 
 ### Choose your best suited model for your application
 
 - Choose the best model from a wide variety of models
 
+<img width="1904" height="962" alt="CleanShot 2025-07-31 at 16 44 16" src="https://github.com/user-attachments/assets/b90b2285-ac0d-48dd-a843-aedb42c3b551" />
 
 ## About
 
@@ -289,5 +302,40 @@ A: Yes! You can:
 - Use tags for additional organization
 - Bulk manage tasks within categories
 
+## 🤝 Contributing
+
+We welcome contributions! Here's how you can help:
+
+### Development Setup
+1. Fork the repository
+2. Clone your fork: `git clone https://github.com/your-username/copilot-todo-list.git`
+3. Install dependencies: `npm install`
+4. Create a feature branch: `git checkout -b feature/your-feature`
+5. Make your changes and add tests
+6. Run tests: `npm test`
+7. Submit a pull request
+
+### Code Standards
+- TypeScript: Strict typing required
+- ESLint: All rules must pass
+- Testing: New features require tests
+- Documentation: Public APIs must be documented
+
+## 📄 License
+
+MIT License - see LICENSE file for details.
+
+## 🆘 Support
+
+- 📧 Email: support@example.com
+- 🐛 Issues: [GitHub Issues](https://github.com/yourusername/copilot-todo-list/issues)
+- 📖 Documentation: [Project Wiki](https://github.com/yourusername/copilot-todo-list/wiki)
+- 💬 Discord: [Join our community](https://discord.gg/your-invite)
+
+## 🔗 Links
+
+- Website: [Copilot Todo List](https://your-demo-site.com)
+- GitHub: [copilot-todo-list](https://github.com/yourusername/copilot-todo-list)
+- Documentation: [Project Documentation](https://your-docs-site.com)
 
 Made with ❤️ by YourGPT Team
