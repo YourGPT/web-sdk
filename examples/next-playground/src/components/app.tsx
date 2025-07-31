@@ -10,8 +10,8 @@ import { YourGPT, useAIActions } from "@yourgpt/widget-web-sdk/react";
 
 // Initialize SDK
 YourGPT.init({
-  widgetId: process.env.NEXT_PUBLIC_WIDGET_UID!,
-  endpoint: process.env.NEXT_PUBLIC_WIDGET_ENDPOINT!,
+  widgetId: "271f1c55-4a82-4c7f-9634-762078763943",
+  endpoint: "https://dev-widget.yourgpt.ai",
   debug: true,
 });
 
