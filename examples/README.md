@@ -80,7 +80,6 @@ import { YourGPT } from "@yourgpt/widget-web-sdk";
 // Initialize the SDK
 await YourGPT.init({
   widgetId: "your-widget-id",
-  endpoint: "https://widget.yourgpt.ai",
 });
 
 // Get the SDK instance
