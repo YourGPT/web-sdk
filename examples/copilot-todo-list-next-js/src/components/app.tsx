@@ -11,8 +11,7 @@ import { useTheme, type Theme } from "@/components/theme-provider";
 
 // Initialize SDK
 YourGPT.init({
-  widgetId: "271f1c55-4a82-4c7f-9634-762078763943",
-  endpoint: "https://dev-widget.yourgpt.ai",
+  widgetId: "your-widget-id",
   debug: true,
 });
 
