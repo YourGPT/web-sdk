@@ -12,7 +12,6 @@ import { useTheme, type Theme } from "@/components/theme-provider";
 // Initialize SDK
 YourGPT.init({
   widgetId: "your-widget-id",
-  debug: true,
 });
 
 interface ToolFunction {
