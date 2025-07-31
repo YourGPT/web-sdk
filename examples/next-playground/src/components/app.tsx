@@ -1,19 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Todo } from "@/types/todo";
 import { Navigation } from "@/components/navigation";
 import { TodoList } from "@/components/todo-app";
 import { KanbanBoard } from "@/components/kanban-board";
 import { YourGPT, useAIActions } from "@yourgpt/widget-web-sdk/react";
-
-// Initialize SDK
-YourGPT.init({
-  widgetId: process.env.NEXT_PUBLIC_WIDGET_UID!,
-  endpoint: process.env.NEXT_PUBLIC_WIDGET_ENDPOINT!,
-  debug: true,
-});
 
 interface AppProps {
   view: "list" | "kanban";
@@ -23,16 +16,35 @@ export function App({ view }: AppProps) {
   const currentView = view;
   const [todos, setTodos] = useState<Todo[]>([]);
 
-  const aiActions = useAIActions();
+  const { registerAction, unregisterAction } = useAIActions();
 
   const applyTheme = (theme: string) => {
     document.documentElement.className = theme === "light" ? "" : theme;
     localStorage.setItem("theme", theme);
   };
 
+  const handleThemeChange = useCallback((data: any, helpers: any) => {
+    console.log("change_theme", data);
+
+    const processData: any = data.action?.tool?.function || {};
+    const args = processData.arguments || `{}`;
+    const theme = JSON.parse(args).theme;
+
+    applyTheme(theme);
+
+    helpers.respond("Theme changed to " + theme);
+  }, []);
+
   useEffect(() => {
+    // Initialize SDK client-side only
+    YourGPT.init({
+      widgetId: process.env.NEXT_PUBLIC_WIDGET_UID!,
+      endpoint: process.env.NEXT_PUBLIC_WIDGET_ENDPOINT!,
+      debug: true,
+    });
+
     // Register location action
-    aiActions.registerAction("get_location", async (data, helpers) => {
+    registerAction("get_location", async (data, helpers) => {
       const confirmed = await helpers.confirm({
         title: "Location Access",
         description: "This React app wants to access your location. Allow?",
@@ -61,23 +73,16 @@ export function App({ view }: AppProps) {
       );
     });
 
-    aiActions.registerAction("change_theme", async (data, helpers) => {
-      console.log("change_theme", data);
-
-      const processData: any = data.action?.tool?.function || {};
-      const args = processData.arguments || `{}`;
-      const theme = JSON.parse(args).theme;
-
-      applyTheme(theme);
-
-      helpers.respond("Theme changed to " + theme);
+    registerAction("change_theme", handleThemeChange);
+    registerAction("navigate_to_path", (data, helpers) => {
+      helpers.respond("Navigating to path: ");
     });
 
     return () => {
-      aiActions.unregisterAction("get_location");
-      aiActions.unregisterAction("change_theme");
+      unregisterAction("get_location");
+      unregisterAction("change_theme");
     };
-  }, []);
+  }, [registerAction, unregisterAction, handleThemeChange]);
 
   // Load todos from localStorage on mount
   useEffect(() => {
