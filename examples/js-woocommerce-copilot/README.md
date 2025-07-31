@@ -430,7 +430,7 @@ $yourgptChatbot.on("ai:action:repeat_order", async (data, action) => {
 MIT License - see LICENSE file for details.
 
 ## 🆘 Support
-- 📧 Email: support@example.com
+- 📧 Email: support@yourgpt.ai
 - 🐛 Issues: [GitHub Issues](https://github.com/yourgpt/woocommerce-ai-action/issues)
 - 📖 Documentation: [Project Wiki](https://github.com/yourgpt/woocommerce-ai-action/wiki)
 - 💬 Discord: [Join our community](https://discord.gg/yourgpt)
