@@ -139,9 +139,6 @@ class YourGPTSDK extends EventEmitter<YourGPTEvents> {
       // Create root container
       this.createRootContainer();
 
-      // Load CSS
-      // await loadCSS(`${endpoint}/chatbot.css`);
-
       // Load JavaScript
       await loadScript(`${endpoint}/chatbot.js`);
 

@@ -226,7 +226,6 @@ export const loadScript = (src: string, async: boolean = true): Promise<void> =>
     const script = document.createElement('script');
     script.src = src;
     script.async = async;
-    script.type = 'module';
     
     script.onload = () => resolve();
     script.onerror = () => reject(new YourGPTError(`Failed to load script: ${src}`));
